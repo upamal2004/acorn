@@ -4,22 +4,25 @@ import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { formatMoney } from "@/lib/money";
 import { PENDING_VERIFICATION, PAID } from "@/lib/summary";
+import { categoryMeta } from "@/lib/categories";
+import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
 
-/** Chronological list of the room's expenses with a settle → verify workflow:
- *  - members tap "Settle my share" → their share becomes PENDING_VERIFICATION
- *    (no balance change yet);
- *  - the payer of the expense sees Approve/Reject on those shares — only an
- *    approval moves the wallet balances.
- *  After any action the parent's `onChanged` fires the AJAX refresh. */
+/** Chronological list of the expenses involving the signed-in user (the
+ *  dashboard feed is filtered server-side to expenses they paid for or were
+ *  split with). Each row shows the user's own share, a settle → verify
+ *  workflow, and — for long titles or expenses with notes — a "View details"
+ *  affordance that opens the full-expense modal. */
 export function ExpenseList({ expenses, members, currentUserId, onChanged }) {
+  const [detailExpense, setDetailExpense] = useState(null);
+
   if (!expenses.length) {
     return (
       <section className="card border-dashed text-center">
         <p className="text-3xl">🧾</p>
         <h2 className="mt-2 text-lg font-semibold text-slate-800">No expenses yet</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Add your first expense — rent, groceries, that takeaway — and it shows
-          up here for the whole room.
+          Add an expense — rent, groceries, that takeaway — and it shows up here
+          for you and whoever you split it with.
         </p>
       </section>
     );
@@ -38,14 +41,24 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged }) {
             members={members}
             currentUserId={currentUserId}
             onChanged={onChanged}
+            onView={() => setDetailExpense(exp)}
           />
         ))}
       </ul>
+
+      {detailExpense && (
+        <ExpenseDetailModal
+          expense={detailExpense}
+          members={members}
+          currentUserId={currentUserId}
+          onClose={() => setDetailExpense(null)}
+        />
+      )}
     </section>
   );
 }
 
-function ExpenseRow({ expense, members, currentUserId, onChanged }) {
+function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
@@ -55,6 +68,12 @@ function ExpenseRow({ expense, members, currentUserId, onChanged }) {
   const isOwner = expense.paidBy === currentUserId; // the payer verifies settlements
   const canDelete = expense.createdBy === currentUserId;
   const splitCount = Object.keys(expense.splits || {}).length;
+
+  // Long titles and expenses with notes get a "View details" affordance so the
+  // full text never needs to squeeze into the row — it opens a clean modal.
+  const isLong = (expense.title || "").length > 48;
+  const hasNotes = Boolean(expense.description);
+  const canViewDetails = isLong || hasNotes;
 
   // Other members' shares waiting on the owner's approval.
   const pendingVerifications = isOwner
@@ -111,8 +130,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged }) {
   return (
     <li className="py-3.5">
       <div className="flex items-center gap-4">
-        <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-acorn-100 text-acorn-600">
-          <ExpenseGlyph title={expense.title} />
+        <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-slate-50 text-lg">
+          <ExpenseGlyph expense={expense} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -125,6 +144,14 @@ function ExpenseRow({ expense, members, currentUserId, onChanged }) {
             {splitCount} {splitCount === 1 ? "person" : "people"} ·{" "}
             {formatMoney(expense.amount)} total
           </p>
+          {canViewDetails && (
+            <button
+              onClick={onView}
+              className="mt-1 inline-flex items-center gap-0.5 text-xs font-semibold text-acorn-600 transition hover:text-acorn-700"
+            >
+              View details <span aria-hidden="true">→</span>
+            </button>
+          )}
         </div>
 
         <div className="flex flex-none flex-wrap items-center justify-end gap-2 text-right">
@@ -267,8 +294,14 @@ function XIcon() {
   );
 }
 
-function ExpenseGlyph({ title }) {
-  const t = (title || "").toLowerCase();
+function ExpenseGlyph({ expense }) {
+  const cat = categoryMeta(expense.category);
+  // A real category wins; "Others" (or legacy rows) fall back to guessing an
+  // emoji from the title so the box still feels personal.
+  if (expense.category && expense.category !== "OTHERS") {
+    return <span style={{ color: cat.color }}>{cat.emoji}</span>;
+  }
+  const t = (expense.title || "").toLowerCase();
   const map = {
     rent: "🏠",
     utility: "💡",
@@ -287,5 +320,5 @@ function ExpenseGlyph({ title }) {
     netflix: "📺",
   };
   const hit = Object.keys(map).find((k) => t.includes(k));
-  return <span className="text-lg">{hit ? map[hit] : "🧾"}</span>;
+  return <span className="text-slate-400">{hit ? map[hit] : "🧾"}</span>;
 }

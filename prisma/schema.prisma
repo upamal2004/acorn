@@ -53,13 +53,15 @@ model Room {
 }
 
 model Expense {
-  id        String   @id @default(cuid())
-  roomId    String?  // null = personal expense, owned only by the creator
-  title     String
-  amount    Int      // total, in cents
-  paidBy    String
-  createdBy String   // who added this entry (only they may delete it)
-  createdAt DateTime @default(now())
+  id          String           @id @default(cuid())
+  roomId      String?          // null = personal expense, owned only by the creator
+  title       String
+  description String?          // optional long-form details, shown in the expense detail modal
+  category    ExpenseCategory  @default(OTHERS)
+  amount      Int              // total, in cents
+  paidBy      String
+  createdBy   String           // who added this entry (only they may delete it)
+  createdAt   DateTime         @default(now())
 
   room   Room?          @relation(fields: [roomId], references: [id], onDelete: Cascade)
   payer  User           @relation("PaidBy", fields: [paidBy], references: [id])
@@ -86,4 +88,14 @@ enum ShareStatus {
   PENDING
   PENDING_VERIFICATION // member said they paid — awaiting the payer's approval
   PAID
+}
+
+enum ExpenseCategory {
+  FOOD
+  TRANSPORT
+  UTILITIES
+  ENTERTAINMENT
+  MEDICAL
+  RENT
+  OTHERS
 }

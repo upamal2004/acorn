@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const [room, members, expenses] = await Promise.all([
     getRoom(user.roomId),
     getMembers(user.roomId),
-    getExpenses(user.roomId),
+    getExpenses(user.roomId, user.id),
   ]);
 
   return <Dashboard user={user} room={room} members={members} expenses={expenses} />;

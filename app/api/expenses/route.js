@@ -9,6 +9,7 @@
 // the current user.
 import { ok, bad, requireUser } from "@/lib/api";
 import { isRoomMember, getMembers, createExpense } from "@/lib/queries";
+import { isValidCategory } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function POST(req) {
   const user = await requireUser();
   if (!user) return bad("Unauthorized", 401);
 
-  const { roomId, title, amount, splitBetween } = await req
+  const { roomId, title, description, category, amount, splitBetween } = await req
     .json()
     .catch(() => ({}));
 
@@ -24,6 +25,9 @@ export async function POST(req) {
   if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
     return bad("Amount must be a number greater than zero.");
   }
+
+  // Category is optional — anything invalid (or missing) falls back to Others.
+  const cleanCategory = isValidCategory(category) ? category : "OTHERS";
 
   let cleanSplit;
   if (roomId) {
@@ -47,6 +51,8 @@ export async function POST(req) {
   const expenseId = await createExpense({
     roomId: roomId ?? null,
     title,
+    description,
+    category: cleanCategory,
     amount: parsedAmount,
     paidBy: user.id, // the creator is strictly the person who paid
     createdBy: user.id,

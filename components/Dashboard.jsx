@@ -12,6 +12,7 @@ import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseModal } from "@/components/ExpenseModal";
 import { ExpenseHistory } from "@/components/ExpenseHistory";
+import { AnalyticsModal } from "@/components/AnalyticsModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { filterMyExpenses } from "@/lib/history";
 import { computeSummary } from "@/lib/summary";
@@ -38,6 +39,7 @@ export function Dashboard({
   const { user, room, members, expenses } = data;
   const [modalOpen, setModalOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const inflight = useRef(false);
@@ -206,6 +208,14 @@ export function Dashboard({
                 <DoorIcon /> Leave room
               </button>
             )}
+            {expenses.length > 0 && (
+              <button
+                onClick={() => setAnalyticsOpen(true)}
+                className="btn-secondary"
+              >
+                <ChartIcon /> Insights
+              </button>
+            )}
             {myExpenses.length > 0 && (
               <button
                 onClick={() => setHistoryOpen(true)}
@@ -293,6 +303,14 @@ export function Dashboard({
         />
       )}
 
+      {analyticsOpen && (
+        <AnalyticsModal
+          expenses={expenses}
+          currentUserId={user.id}
+          onClose={() => setAnalyticsOpen(false)}
+        />
+      )}
+
       {settingsOpen && (
         <SettingsModal
           user={user}
@@ -332,6 +350,20 @@ function CalendarIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 4v16h16M8 16l3-4 3 3 4-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

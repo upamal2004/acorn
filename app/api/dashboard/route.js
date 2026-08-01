@@ -27,7 +27,7 @@ export async function GET() {
   const [room, members, expenses] = await Promise.all([
     getRoom(profile.roomId),
     getMembers(profile.roomId),
-    getExpenses(profile.roomId),
+    getExpenses(profile.roomId, profile.id), // only expenses involving this user
   ]);
 
   return ok({ user: profile, room, members, expenses });

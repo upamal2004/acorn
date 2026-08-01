@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
+import { EXPENSE_CATEGORIES } from "@/lib/categories";
 
-/** Modal form for adding an expense: title, amount, split members.
- *  The person adding the expense always pays for it ("Paid by: you") — there
- *  is no payer picker. Everyone who participated (including the creator) can
- *  be selected or unchecked; if the creator isn't in the split, the full
- *  amount is shared among the selected members only and the creator is owed
- *  the total. When `roomId` is null it's a personal (solo) expense: you pay
- *  for yourself, so the split picker is hidden too. */
+/** Modal form for adding an expense: title, category, description, amount,
+ *  split members. The person adding the expense always pays for it ("Paid by:
+ *  you") — there is no payer picker. Everyone who participated (including the
+ *  creator) can be selected or unchecked; if the creator isn't in the split,
+ *  the full amount is shared among the selected members only and the creator
+ *  is owed the total. When `roomId` is null it's a personal (solo) expense:
+ *  you pay for yourself, so the split picker is hidden too. */
 export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved }) {
   const isPersonal = !roomId;
   const me = members.find((m) => m.id === currentUserId);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("OTHERS");
   const [amount, setAmount] = useState("");
   const [selected, setSelected] = useState(() =>
     isPersonal
@@ -40,6 +43,8 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
     const body = isPersonal
       ? {
           title,
+          description,
+          category,
           amount,
           paidBy: currentUserId,
           splitBetween: [currentUserId],
@@ -47,6 +52,8 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
       : {
           roomId,
           title,
+          description,
+          category,
           amount,
           paidBy: currentUserId,
           splitBetween: [...selected],
@@ -96,6 +103,37 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
               required
               autoFocus
             />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                Category
+              </label>
+              <select
+                className="input"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {EXPENSE_CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.emoji} {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                Notes{" "}
+                <span className="font-normal text-slate-400">(optional)</span>
+              </label>
+              <input
+                className="input"
+                placeholder="e.g. Split with Sam and the milk money"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className={`grid gap-3 ${isPersonal ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
