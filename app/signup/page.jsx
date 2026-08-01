@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function SignupPage() {
   const session = await auth();
-  if (session?.user) redirect(session.user.roomId ? "/dashboard" : "/onboarding");
+  if (session?.user) redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
@@ -16,7 +16,7 @@ export default async function SignupPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Start your room and split expenses the easy way.
+            Track your spending solo, or start a room and split the easy way.
           </p>
         </div>
 

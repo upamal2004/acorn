@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 
 /**
  * First-run screen for a user with no room yet: either create a new room or
- * join an existing one with its ACORN code.
+ * join an existing one with its ACORN code. Rooms are optional — users can
+ * skip straight to their personal-mode dashboard.
  */
 export function Onboarding({ user }) {
   const router = useRouter();
@@ -57,7 +59,8 @@ export function Onboarding({ user }) {
             Hi{user?.name ? `, ${user.name.split(" ")[0]}` : ""}!
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            You're not part of a room yet. Create one or join a friend's.
+            Create a room, join a friend's with its code — or skip for now and
+            use Acorn solo.
           </p>
         </div>
 
@@ -139,6 +142,13 @@ export function Onboarding({ user }) {
             </button>
           </form>
         </div>
+
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Not sure yet?{" "}
+          <Link href="/dashboard" className="font-semibold text-acorn-600 hover:text-acorn-700">
+            Use Acorn solo for now
+          </Link>
+        </p>
       </div>
     </div>
   );

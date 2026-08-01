@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
   const session = await auth();
-  if (session?.user) redirect(session.user.roomId ? "/dashboard" : "/onboarding");
+  if (session?.user) redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
@@ -16,7 +16,7 @@ export default async function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Sign in to reach your room.
+            Sign in to reach your space.
           </p>
         </div>
 

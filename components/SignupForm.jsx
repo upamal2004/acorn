@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 /** Email/password sign-up: creates the account, then signs in automatically
- *  and sends the user to onboarding. */
+ *  and sends the user to their (personal-mode) dashboard. */
 export function SignupForm() {
   const router = useRouter();
 
@@ -37,7 +37,7 @@ export function SignupForm() {
       });
       if (signInRes?.error) throw new Error("Account created — please sign in.");
 
-      router.push("/onboarding");
+      router.push("/dashboard");
       router.refresh();
     } catch (err) {
       setError(err.message);

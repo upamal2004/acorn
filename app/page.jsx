@@ -21,32 +21,22 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-6 py-16 text-center">
-        <div className="mb-6 animate-float">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/cover.png"
-            alt="Acorn cover"
-            width={160}
-            height={160}
-            className="rounded-3xl object-cover shadow-soft"
-          />
-        </div>
-
         <h1 className="max-w-2xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-6xl">
           Split rent, bills & groceries{" "}
           <span className="text-acorn-500">without the maths.</span>
         </h1>
 
         <p className="mt-5 max-w-xl text-lg text-slate-600">
-          Acorn keeps a single shared ledger for your household. Add an expense,
-          everyone sees who owes what, and one tap settles a share. No spreadsheets,
-          no "you owe me" texts.
+          Acorn keeps a single shared ledger for your household — or just yours.
+          Track your spending solo, add an expense when you're ready, and when a
+          room's involved everyone sees who owes what. No spreadsheets, no
+          "you owe me" texts.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {session?.user ? (
             <Link href="/dashboard" className="btn-primary px-6 py-3 text-base">
-              Go to my room
+              Open my dashboard
             </Link>
           ) : (
             <Link href="/signup" className="btn-primary px-6 py-3 text-base">

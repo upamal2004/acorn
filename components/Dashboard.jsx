@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -52,14 +53,21 @@ export function Dashboard({ user, room, members, expenses }) {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">
-              {room?.name ?? "Your room"}
+              {room?.name ?? "Your personal space"}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Invite flatmates with code{" "}
-              <span className="font-mono font-semibold text-acorn-600">
-                {room?.code}
-              </span>
-            </p>
+            {room ? (
+              <p className="mt-1 text-sm text-slate-500">
+                Invite flatmates with code{" "}
+                <span className="font-mono font-semibold text-acorn-600">
+                  {room.code}
+                </span>
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-slate-500">
+                Tracking your own spending. Create or join a room to split
+                expenses with flatmates.
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             {expenses.length > 0 && (
@@ -87,23 +95,46 @@ export function Dashboard({ user, room, members, expenses }) {
           </div>
 
           <div className="space-y-6">
-            <RoomSummary
-              expenses={expenses}
-              members={members}
-              currentUserId={user.id}
-            />
-            <MembersCard
-              members={members}
-              currentUserId={user.id}
-              expenses={expenses}
-            />
+            {room ? (
+              <>
+                <RoomSummary
+                  expenses={expenses}
+                  members={members}
+                  currentUserId={user.id}
+                />
+                <MembersCard
+                  members={members}
+                  currentUserId={user.id}
+                  expenses={expenses}
+                />
+              </>
+            ) : (
+              <div className="card">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Ready to split?
+                </h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                  You're in personal mode — every expense is just yours. Create
+                  a room or join a friend's with its code to split costs as a
+                  group.
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Link href="/onboarding" className="btn-primary">
+                    Create a room
+                  </Link>
+                  <Link href="/onboarding" className="btn-secondary">
+                    Join a room
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
 
       {modalOpen && (
         <ExpenseModal
-          roomId={room.id}
+          roomId={room?.id ?? null}
           members={members}
           currentUserId={user.id}
           onClose={() => setModalOpen(false)}

@@ -50,14 +50,14 @@ model Room {
 
 model Expense {
   id        String   @id @default(cuid())
-  roomId    String
+  roomId    String?  // null = personal expense, owned only by the creator
   title     String
   amount    Int      // total, in cents
   paidBy    String
   createdBy String   // who added this entry (only they may delete it)
   createdAt DateTime @default(now())
 
-  room   Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  room   Room?          @relation(fields: [roomId], references: [id], onDelete: Cascade)
   payer  User           @relation("PaidBy", fields: [paidBy], references: [id])
   creator User          @relation("CreatedBy", fields: [createdBy], references: [id])
   shares ExpenseShare[]

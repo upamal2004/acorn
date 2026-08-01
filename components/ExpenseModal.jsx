@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
 
-/** Modal form for adding an expense: title, amount, payer, split members. */
+/** Modal form for adding an expense: title, amount, payer, split members.
+ *  When `roomId` is null it's a personal (solo) expense — you pay for
+ *  yourself, so the payer and split pickers are hidden. */
 export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved }) {
+  const isPersonal = !roomId;
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [paidBy, setPaidBy] = useState(currentUserId);
-  const [selected, setSelected] = useState(() => new Set(members.map((m) => m.id)));
+  const [selected, setSelected] = useState(() =>
+    isPersonal
+      ? new Set([currentUserId])
+      : new Set(members.map((m) => m.id))
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -26,13 +33,20 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
     setBusy(true);
     setError("");
 
-    const body = {
-      roomId,
-      title,
-      amount,
-      paidBy,
-      splitBetween: [...selected],
-    };
+    const body = isPersonal
+      ? {
+          title,
+          amount,
+          paidBy: currentUserId,
+          splitBetween: [currentUserId],
+        }
+      : {
+          roomId,
+          title,
+          amount,
+          paidBy,
+          splitBetween: [...selected],
+        };
 
     try {
       const res = await fetch("/api/expenses", {
@@ -80,7 +94,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid gap-3 ${isPersonal ? "grid-cols-1" : "grid-cols-2"}`}>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">
                 Total amount
@@ -102,48 +116,52 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
                 />
               </div>
             </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                Paid by
-              </label>
-              <select
-                className="input"
-                value={paidBy}
-                onChange={(e) => setPaidBy(e.target.value)}
-              >
-                {members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!isPersonal && (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Paid by
+                </label>
+                <select
+                  className="input"
+                  value={paidBy}
+                  onChange={(e) => setPaidBy(e.target.value)}
+                >
+                  {members.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">
-              Split between ({selected.size})
-            </label>
-            <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
-              {members.map((m) => (
-                <label
-                  key={m.id}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${
-                    selected.has(m.id) ? "bg-acorn-50" : "hover:bg-slate-50"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-acorn-500"
-                    checked={selected.has(m.id)}
-                    onChange={() => toggle(m.id)}
-                  />
-                  <Avatar name={m.name} image={m.image} size={26} />
-                  <span className="text-sm text-slate-700">{m.name}</span>
-                </label>
-              ))}
+          {!isPersonal && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                Split between ({selected.size})
+              </label>
+              <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
+                {members.map((m) => (
+                  <label
+                    key={m.id}
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${
+                      selected.has(m.id) ? "bg-acorn-50" : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 accent-acorn-500"
+                      checked={selected.has(m.id)}
+                      onChange={() => toggle(m.id)}
+                    />
+                    <Avatar name={m.name} image={m.image} size={26} />
+                    <span className="text-sm text-slate-700">{m.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -153,14 +171,16 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
 
           <button
             type="submit"
-            disabled={busy || !selected.size}
+            disabled={busy || (!isPersonal && !selected.size)}
             className="btn-primary w-full py-3"
           >
             {busy
               ? "Adding…"
-              : selected.size
-                ? `Add expense${selected.size > 1 ? ` — splits ${selected.size} ways` : ""}`
-                : "Pick someone to split with"}
+              : isPersonal
+                ? "Add expense"
+                : selected.size
+                  ? `Add expense${selected.size > 1 ? ` — splits ${selected.size} ways` : ""}`
+                  : "Pick someone to split with"}
           </button>
         </form>
       </div>
