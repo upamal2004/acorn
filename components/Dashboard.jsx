@@ -1,0 +1,114 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
+import { Avatar } from "@/components/Avatar";
+import { WalletCard } from "@/components/WalletCard";
+import { RoomSummary } from "@/components/RoomSummary";
+import { MembersCard } from "@/components/MembersCard";
+import { ExpenseList } from "@/components/ExpenseList";
+import { ExpenseModal } from "@/components/ExpenseModal";
+
+/** Main signed-in screen. Server-rendered data is passed in and kept in sync
+ *  with `router.refresh()` after mutations. */
+export function Dashboard({ user, room, members, expenses }) {
+  const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  async function signOut() {
+    await fetch("/api/auth/signout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
+
+  return (
+    <div className="min-h-screen">
+      {/* Top bar */}
+      <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3.5">
+          <Logo size={26} />
+          <div className="flex items-center gap-3">
+            {room && (
+              <span className="hidden rounded-full bg-peach-100 px-3 py-1 font-mono text-xs font-semibold text-peach-700 sm:inline">
+                {room.code}
+              </span>
+            )}
+            <Avatar name={user.name} image={user.image} size={32} />
+            <button
+              onClick={signOut}
+              className="btn-ghost px-3 py-1.5 text-xs"
+              title="Sign out"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-5xl px-6 py-8">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {room?.name ?? "Your room"}
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Invite flatmates with code{" "}
+              <span className="font-mono font-semibold text-peach-600">
+                {room?.code}
+              </span>
+            </p>
+          </div>
+          <button onClick={() => setModalOpen(true)} className="btn-primary">
+            <PlusIcon /> Add expense
+          </button>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <WalletCard user={user} />
+            <ExpenseList
+              expenses={expenses}
+              members={members}
+              currentUserId={user.id}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <RoomSummary
+              expenses={expenses}
+              members={members}
+              currentUserId={user.id}
+            />
+            <MembersCard
+              members={members}
+              currentUserId={user.id}
+              expenses={expenses}
+            />
+          </div>
+        </div>
+      </main>
+
+      {modalOpen && (
+        <ExpenseModal
+          roomId={room.id}
+          members={members}
+          currentUserId={user.id}
+          onClose={() => setModalOpen(false)}
+          onSaved={() => {
+            setModalOpen(false);
+            router.refresh();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+    </svg>
+  );
+}

@@ -1,0 +1,31 @@
+{
+  "name": "peach",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Peach — shared room expense & personal wallet tracker (Next.js + Neo4j)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "setup": "node scripts/setup.js",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@auth/core": "^0.41.3",
+    "@auth/prisma-adapter": "^2.11.3",
+    "@prisma/client": "^6.19.3",
+    "next": "^16.2.12",
+    "next-auth": "5.0.0-beta.32",
+    "pg": "^8.22.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^3.4.17"
+  }
+}

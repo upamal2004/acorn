@@ -1,0 +1,117 @@
+// Peach data model — Neon (PostgreSQL) via Prisma ORM.
+//
+// Auth.js (Google) models + the room/expense domain. All money is stored as
+// integer cents (amount, share amount, wallet balance) to avoid float drift;
+// the API converts to dollars before handing data to the client.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Auth.js ---------------------------------------------------------------
+// User is extended with the Peach domain fields (balance, roomId).
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  // Peach domain
+  balance      Int            @default(0) // wallet, in cents
+  roomId       String?        @unique
+  room         Room?          @relation("Membership", fields: [roomId], references: [id])
+  ownedRooms   Room[]         @relation("Owned")
+  expensesPaid Expense[]      @relation("PaidBy")
+  shares       ExpenseShare[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Peach domain -----------------------------------------------------------
+
+model Room {
+  id        String    @id @default(cuid())
+  name      String
+  code      String    @unique // PEACH-XXX
+  ownerId   String
+  createdAt DateTime  @default(now())
+
+  owner    User      @relation("Owned", fields: [ownerId], references: [id])
+  members  User[]    @relation("Membership")
+  expenses Expense[]
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  roomId    String
+  title     String
+  amount    Int      // total, in cents
+  paidBy    String
+  createdAt DateTime @default(now())
+
+  room   Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  payer  User           @relation("PaidBy", fields: [paidBy], references: [id])
+  shares ExpenseShare[]
+}
+
+// One row per member per expense — the split status lives here.
+model ExpenseShare {
+  id        String       @id @default(cuid())
+  expenseId String
+  userId    String
+  amount    Int          // this member's share, in cents
+  status    ShareStatus  @default(PENDING)
+  paidAt    DateTime?
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([expenseId, userId])
+}
+
+enum ShareStatus {
+  PENDING
+  PAID
+}

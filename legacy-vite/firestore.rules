@@ -1,0 +1,100 @@
+rules_version = '2';
+
+// -----------------------------------------------------------------------------
+// Peach — Firestore Security Rules
+//
+// Data model:
+//   users/{uid}        → { uid, name, email, photoURL, roomId, personalBalance }
+//   rooms/{roomId}     → { name, code, ownerId, memberIds: [uid], createdAt }
+//   roomCodes/{code}   → { roomId }   (public mapping so people can join)
+//   expenses/{id}      → { roomId, title, amount, paidBy, splitBetween,
+//                         splits: { uid: { amount, status, paidAt } } }
+//
+// Rule of thumb: every user can only reach data tied to the room they belong
+// to. A user's room is found via the room code → roomId mapping, so room ids
+// themselves are never guessable.
+// -----------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- roomCodes -----------------------------------------------------------
+    // Readable by any signed-in user so they can resolve a shared code to a
+    // room id. They contain no sensitive data (just the roomId pointer).
+    // Created by the app when a room is created; nothing else can touch them.
+    match /roomCodes/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['roomId'])
+        && request.resource.data.roomId is string;
+      allow update, delete: if false;
+    }
+
+    // --- rooms ---------------------------------------------------------------
+    // Readable only by members. Creation requires you to be the owner of a
+    // brand-new single-member room. Updates must never remove an existing
+    // member; a non-member may add exactly themselves (the "join" flow).
+    match /rooms/{roomId} {
+      allow read: if request.auth != null
+        && request.auth.uid in resource.data.memberIds;
+
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.memberIds.hasOnly([request.auth.uid])
+        && request.resource.data.name is string
+        && request.resource.data.code is string;
+
+      allow update: if request.auth != null
+        && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+        && (
+          request.resource.data.memberIds.size() == resource.data.memberIds.size()
+          ||
+          (request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+           && request.auth.uid in request.resource.data.memberIds)
+        );
+
+      allow delete: if request.auth != null
+        && request.auth.uid == resource.data.ownerId;
+    }
+
+    // --- users ---------------------------------------------------------------
+    // Everyone can read their own profile. A user can also read a profile of
+    // any member who shares the same room (checked through the room doc).
+    // Only the user themselves can write to their profile (wallet balance,
+    // room membership), so nobody can tamper with your balance.
+    match /users/{uid} {
+      function canRead(target) {
+        let targetRoomId = target.data.roomId;
+        return uid == request.auth.uid
+          || (
+            targetRoomId is string
+            && request.auth.uid in get(/databases/$(database)/documents/rooms/$(targetRoomId)).data.memberIds
+          );
+      }
+
+      allow read: if request.auth != null && canRead(resource);
+      allow write: if request.auth != null && uid == request.auth.uid;
+    }
+
+    // --- expenses ------------------------------------------------------------
+    // Only room members can read/create/update/delete expenses, and only for
+    // their own room. The membership check re-reads the room doc server-side.
+    match /expenses/{expenseId} {
+      function isMemberOf(roomId) {
+        return request.auth != null
+          && roomId is string
+          && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.memberIds;
+      }
+
+      allow read: if isMemberOf(resource.data.roomId);
+
+      allow create: if isMemberOf(request.resource.data.roomId)
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0;
+
+      allow update: if isMemberOf(resource.data.roomId);
+
+      allow delete: if isMemberOf(resource.data.roomId);
+    }
+  }
+}

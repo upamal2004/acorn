@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-slate-100 text-slate-800;
+  }
+
+  /* Soft peach radial wash behind everything for a warm feel. */
+  #root {
+    min-height: 100vh;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, rgba(255, 180, 130, 0.28), transparent 60%),
+      radial-gradient(900px 480px at -10% 0%, rgba(255, 107, 94, 0.18), transparent 55%),
+      #f8fafc;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition
+      placeholder:text-slate-400 focus:border-peach-400 focus:ring-4 focus:ring-peach-100;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn bg-peach-500 text-white hover:bg-peach-600 focus:ring-peach-200 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100 focus:ring-slate-200;
+  }
+}
