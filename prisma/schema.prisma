@@ -84,5 +84,6 @@ model ExpenseShare {
 
 enum ShareStatus {
   PENDING
+  PENDING_VERIFICATION // member said they paid — awaiting the payer's approval
   PAID
 }
