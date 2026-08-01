@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -13,6 +13,7 @@ import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseModal } from "@/components/ExpenseModal";
 import { ExpenseHistory } from "@/components/ExpenseHistory";
 import { SettingsModal } from "@/components/SettingsModal";
+import { filterMyExpenses } from "@/lib/history";
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -39,6 +40,14 @@ export function Dashboard({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const inflight = useRef(false);
+
+  // The History tab only shows the logged-in user's own activity — expenses
+  // they added, paid for, or were split into — never other members' unrelated
+  // room expenses.
+  const myExpenses = useMemo(
+    () => filterMyExpenses(expenses, user.id),
+    [expenses, user.id]
+  );
 
   /** Pull the freshest data from the database without touching the DOM. */
   const refresh = useCallback(async () => {
@@ -186,7 +195,7 @@ export function Dashboard({
                 <DoorIcon /> Leave room
               </button>
             )}
-            {expenses.length > 0 && (
+            {myExpenses.length > 0 && (
               <button
                 onClick={() => setHistoryOpen(true)}
                 className="btn-secondary"
@@ -266,8 +275,9 @@ export function Dashboard({
 
       {historyOpen && (
         <ExpenseHistory
-          expenses={expenses}
+          expenses={myExpenses}
           members={members}
+          currentUserId={user.id}
           onClose={() => setHistoryOpen(false)}
         />
       )}

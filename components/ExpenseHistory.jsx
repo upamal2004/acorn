@@ -7,9 +7,11 @@ import { groupExpensesByWeek, groupExpensesByDay } from "@/lib/history";
 
 /**
  * "Expense history" modal: pick a week, see that week's expenses grouped by
- * day (e.g. "Tuesday → Breakfast: Rs. 150, Lunch: Rs. 250").
+ * day (e.g. "Tuesday → Breakfast: Rs. 150, Lunch: Rs. 250"). The list is
+ * pre-filtered by the dashboard to the logged-in user's own activity, so only
+ * the expenses they added, paid for, or were split into are shown.
  */
-export function ExpenseHistory({ expenses, members, onClose }) {
+export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
   const nameById = useMemo(
     () => Object.fromEntries(members.map((m) => [m.id, m.name])),
     [members]
@@ -41,7 +43,12 @@ export function ExpenseHistory({ expenses, members, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <h2 className="text-lg font-bold text-slate-900">Expense history</h2>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Expense history</h2>
+            <p className="mt-0.5 text-xs text-slate-400">
+              Your activity only — expenses you added or were split into.
+            </p>
+          </div>
           <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">
             ✕
           </button>

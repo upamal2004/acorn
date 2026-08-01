@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
 
-/** Modal form for adding an expense: title, amount, payer, split members.
- *  When `roomId` is null it's a personal (solo) expense — you pay for
- *  yourself, so the payer and split pickers are hidden. */
+/** Modal form for adding an expense: title, amount, split members.
+ *  The person adding the expense always pays for it ("Paid by: you") — there
+ *  is no payer picker. When `roomId` is null it's a personal (solo) expense:
+ *  you pay for yourself, so the split picker is hidden too. */
 export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved }) {
   const isPersonal = !roomId;
+  const me = members.find((m) => m.id === currentUserId);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [paidBy, setPaidBy] = useState(currentUserId);
   const [selected, setSelected] = useState(() =>
     isPersonal
       ? new Set([currentUserId])
@@ -44,7 +45,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
           roomId,
           title,
           amount,
-          paidBy,
+          paidBy: currentUserId,
           splitBetween: [...selected],
         };
 
@@ -121,17 +122,15 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">
                   Paid by
                 </label>
-                <select
-                  className="input"
-                  value={paidBy}
-                  onChange={(e) => setPaidBy(e.target.value)}
-                >
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="input flex items-center gap-2">
+                  <Avatar name={me?.name || "You"} image={me?.image} size={22} />
+                  <span className="min-w-0 truncate text-sm text-slate-700">
+                    {me?.name || "You"}
+                  </span>
+                  <span className="ml-auto rounded-full bg-acorn-100 px-2 py-0.5 text-xs font-semibold text-acorn-700">
+                    You
+                  </span>
+                </div>
               </div>
             )}
           </div>
@@ -142,23 +141,36 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
                 Split between ({selected.size})
               </label>
               <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
-                {members.map((m) => (
-                  <label
-                    key={m.id}
-                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${
-                      selected.has(m.id) ? "bg-acorn-50" : "hover:bg-slate-50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-acorn-500"
-                      checked={selected.has(m.id)}
-                      onChange={() => toggle(m.id)}
-                    />
-                    <Avatar name={m.name} image={m.image} size={26} />
-                    <span className="text-sm text-slate-700">{m.name}</span>
-                  </label>
-                ))}
+                {members.map((m) => {
+                  const isMe = m.id === currentUserId;
+                  return (
+                    <label
+                      key={m.id}
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${
+                        isMe
+                          ? "bg-acorn-50"
+                          : selected.has(m.id)
+                            ? "bg-acorn-50"
+                            : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-acorn-500"
+                        checked={selected.has(m.id) || isMe}
+                        disabled={isMe}
+                        onChange={() => toggle(m.id)}
+                      />
+                      <Avatar name={m.name} image={m.image} size={26} />
+                      <span className="text-sm text-slate-700">{m.name}</span>
+                      {isMe && (
+                        <span className="ml-auto text-xs font-medium text-acorn-600">
+                          you pay
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -171,15 +183,15 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
 
           <button
             type="submit"
-            disabled={busy || (!isPersonal && !selected.size)}
+            disabled={busy || (!isPersonal && selected.size < 2)}
             className="btn-primary w-full py-3"
           >
             {busy
               ? "Adding…"
               : isPersonal
                 ? "Add expense"
-                : selected.size
-                  ? `Add expense${selected.size > 1 ? ` — splits ${selected.size} ways` : ""}`
+                : selected.size >= 2
+                  ? `Add expense — splits ${selected.size} ways`
                   : "Pick someone to split with"}
           </button>
         </form>
