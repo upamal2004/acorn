@@ -14,6 +14,7 @@ import { ExpenseModal } from "@/components/ExpenseModal";
 import { ExpenseHistory } from "@/components/ExpenseHistory";
 import { SettingsModal } from "@/components/SettingsModal";
 import { filterMyExpenses } from "@/lib/history";
+import { computeSummary } from "@/lib/summary";
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -103,6 +104,16 @@ export function Dashboard({
   }
 
   async function leaveRoom() {
+    // You can't walk away while you still owe the room money — settle first.
+    const { iOwe, net } = computeSummary(expenses, user.id);
+    if (iOwe > 0 || net < 0) {
+      showToast(
+        "error",
+        "You cannot leave the room with outstanding debts. Please settle all your pending balances first."
+      );
+      return;
+    }
+
     if (
       !window.confirm(
         "Leave this room? You'll go back to personal mode and can join or create another room anytime."

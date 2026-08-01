@@ -2,8 +2,11 @@
 // selected members. Server-side membership checks make sure nobody can touch
 // a room they don't belong to. The creator is always the payer: whatever
 // `paidBy` a client sends is ignored and the current user is used instead.
-// Without a roomId the expense is a personal one (solo mode): it's paid by
-// and split only with the current user.
+// The split is exactly what the client selected — the creator may include
+// themselves or not. If they're left out, the full amount is shared among the
+// selected members only and the creator is owed the total. Without a roomId
+// the expense is a personal one (solo mode): it's paid by and split only with
+// the current user.
 import { ok, bad, requireUser } from "@/lib/api";
 import { isRoomMember, getMembers, createExpense } from "@/lib/queries";
 
@@ -30,12 +33,12 @@ export async function POST(req) {
 
     const memberIds = (await getMembers(roomId)).map((m) => m.id);
 
-    // The creator always pays, so they're always part of the split. Keep
-    // every other selected member too, de-duplicated and room-validated.
-    cleanSplit = [...new Set([user.id, ...(splitBetween || [])])].filter((id) =>
+    // Keep only the members the creator picked, de-duplicated and
+    // room-validated. No one (not even the creator) is forced in.
+    cleanSplit = [...new Set(splitBetween || [])].filter((id) =>
       memberIds.includes(id)
     );
-    if (cleanSplit.length < 2) return bad("Pick at least one member to split with.");
+    if (!cleanSplit.length) return bad("Pick at least one member to split with.");
   } else {
     // Personal (solo) expense — you pay it yourself.
     cleanSplit = [user.id];
