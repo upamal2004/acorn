@@ -7,7 +7,7 @@ import { Avatar } from "@/components/Avatar";
 
 /**
  * First-run screen for a user with no room yet: either create a new room or
- * join an existing one with its PEACH code.
+ * join an existing one with its ACORN code.
  */
 export function Onboarding({ user }) {
   const router = useRouter();
@@ -100,8 +100,8 @@ export function Onboarding({ user }) {
                 />
                 <p className="mt-2 text-xs text-slate-500">
                   We'll generate a shareable code like{" "}
-                  <span className="font-mono font-semibold text-peach-600">
-                    PEACH-3K9
+                  <span className="font-mono font-semibold text-acorn-600">
+                    ACORN-3K9
                   </span>{" "}
                   for your flatmates to join.
                 </p>
@@ -113,7 +113,7 @@ export function Onboarding({ user }) {
                 </label>
                 <input
                   className="input font-mono uppercase"
-                  placeholder="PEACH-3K9"
+                  placeholder="ACORN-3K9"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                 />

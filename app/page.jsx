@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PeachIcon } from "@/components/PeachIcon";
+import { AcornIcon } from "@/components/AcornIcon";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/auth";
 
@@ -15,24 +15,24 @@ export default async function Home() {
             Open your dashboard
           </Link>
         ) : (
-          <Link href="/login" className="btn-primary">
-            Sign in
+          <Link href="/signup" className="btn-primary">
+            Sign up free
           </Link>
         )}
       </header>
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-6 py-16 text-center">
         <div className="mb-6 animate-float">
-          <PeachIcon size={96} />
+          <AcornIcon size={96} />
         </div>
 
         <h1 className="max-w-2xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-6xl">
           Split rent, bills & groceries{" "}
-          <span className="text-peach-500">without the maths.</span>
+          <span className="text-acorn-500">without the maths.</span>
         </h1>
 
         <p className="mt-5 max-w-xl text-lg text-slate-600">
-          Peach keeps a single shared ledger for your household. Add an expense,
+          Acorn keeps a single shared ledger for your household. Add an expense,
           everyone sees who owes what, and one tap settles a share. No spreadsheets,
           no "you owe me" texts.
         </p>
@@ -43,7 +43,7 @@ export default async function Home() {
               Go to my room
             </Link>
           ) : (
-            <Link href="/login" className="btn-primary px-6 py-3 text-base">
+            <Link href="/signup" className="btn-primary px-6 py-3 text-base">
               Get started free
             </Link>
           )}
@@ -54,12 +54,12 @@ export default async function Home() {
             {
               emoji: "🔗",
               title: "One room, one code",
-              body: "Create a room, share its PEACH code, and your flatmates join in seconds.",
+              body: "Create a room, share its ACORN code, and your flatmates join in seconds.",
             },
             {
               emoji: "🧾",
               title: "Expenses split equally",
-              body: "Add any expense and pick who's in. Peach works out the shares for you.",
+              body: "Add any expense and pick who's in. Acorn works out the shares for you.",
             },
             {
               emoji: "✅",
@@ -77,7 +77,7 @@ export default async function Home() {
       </main>
 
       <footer className="border-t border-slate-200/80 py-6 text-center text-sm text-slate-500">
-        Made with 🍑 — shared expenses, minus the awkwardness.
+        Made with 🌰 — shared expenses, minus the awkwardness.
       </footer>
     </div>
   );

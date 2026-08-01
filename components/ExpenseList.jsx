@@ -66,7 +66,7 @@ function ExpenseRow({ expense, members, currentUserId }) {
 
   return (
     <li className="flex items-center gap-4 py-3.5">
-      <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-peach-100 text-peach-600">
+      <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-acorn-100 text-acorn-600">
         <ExpenseGlyph title={expense.title} />
       </div>
 

@@ -1,9 +1,9 @@
 import { Logo } from "@/components/Logo";
-import { LoginForm } from "@/components/LoginForm";
+import { SignupForm } from "@/components/SignupForm";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+export default async function SignupPage() {
   const session = await auth();
   if (session?.user) redirect(session.user.roomId ? "/dashboard" : "/onboarding");
 
@@ -14,20 +14,20 @@ export default async function LoginPage() {
           <div className="mb-4 flex justify-center">
             <Logo size={40} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Sign in to reach your room.
+            Start your room and split expenses the easy way.
           </p>
         </div>
 
         <div className="card">
-          <LoginForm />
+          <SignupForm />
         </div>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          New here?{" "}
-          <a href="/signup" className="font-semibold text-acorn-600 hover:text-acorn-700">
-            Create an account
+          Already have an account?{" "}
+          <a href="/login" className="font-semibold text-acorn-600 hover:text-acorn-700">
+            Sign in
           </a>
         </p>
       </div>

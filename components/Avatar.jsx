@@ -1,4 +1,4 @@
-/** Round avatar: profile image when available, otherwise initials on peach. */
+/** Round avatar: profile image when available, otherwise initials on acorn. */
 export function Avatar({ name = "", image, size = 36 }) {
   if (image) {
     return (
@@ -24,7 +24,7 @@ export function Avatar({ name = "", image, size = 36 }) {
 
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full bg-peach-200 font-semibold text-peach-700"
+      className="inline-flex items-center justify-center rounded-full bg-acorn-200 font-semibold text-acorn-700"
       style={{ width: size, height: size, fontSize: size * 0.38 }}
       aria-hidden="true"
     >

@@ -30,7 +30,7 @@ export function Dashboard({ user, room, members, expenses }) {
           <Logo size={26} />
           <div className="flex items-center gap-3">
             {room && (
-              <span className="hidden rounded-full bg-peach-100 px-3 py-1 font-mono text-xs font-semibold text-peach-700 sm:inline">
+              <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
                 {room.code}
               </span>
             )}
@@ -54,7 +54,7 @@ export function Dashboard({ user, room, members, expenses }) {
             </h1>
             <p className="mt-1 text-sm text-slate-500">
               Invite flatmates with code{" "}
-              <span className="font-mono font-semibold text-peach-600">
+              <span className="font-mono font-semibold text-acorn-600">
                 {room?.code}
               </span>
             </p>

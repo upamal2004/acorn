@@ -1,4 +1,4 @@
-// POST /api/rooms/join — join an existing room using its PEACH-XXX code.
+// POST /api/rooms/join — join an existing room using its ACORN-XXX code.
 import { ok, bad, requireUser } from "@/lib/api";
 import { getUser, joinRoom } from "@/lib/queries";
 import { normalizeRoomCode, isValidRoomCode } from "@/lib/room-code";
@@ -16,7 +16,7 @@ export async function POST(req) {
   const clean = normalizeRoomCode(code);
 
   if (!isValidRoomCode(clean)) {
-    return bad("Invalid code format. Expected something like PEACH-9X2.");
+    return bad("Invalid code format. Expected something like ACORN-9X2.");
   }
 
   try {

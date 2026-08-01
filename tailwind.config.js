@@ -8,22 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        peach: {
-          50: "#FFF7F2",
-          100: "#FFEDE0",
-          200: "#FFD7BF",
-          300: "#FFB98F",
-          400: "#FF9460",
-          500: "#FB713F",
-          600: "#E8552A",
-          700: "#C03F1E",
-        },
-        coral: {
-          50: "#FFF1F0",
-          100: "#FFE0DE",
-          400: "#FF8A7A",
-          500: "#FF6B5E",
-          600: "#E84A3D",
+        acorn: {
+          50: "#FAF6EF",
+          100: "#F3EADA",
+          200: "#E6D3B0",
+          300: "#D6B481",
+          400: "#C28F56",
+          500: "#AC7138",
+          600: "#8F582B",
+          700: "#734521",
+          800: "#5D381D",
+          900: "#4C2F1A",
         },
       },
       fontFamily: {
@@ -39,7 +34,7 @@ export default {
         ],
       },
       boxShadow: {
-        soft: "0 10px 40px -12px rgba(251, 113, 63, 0.35)",
+        soft: "0 10px 40px -12px rgba(143, 88, 43, 0.35)",
       },
       keyframes: {
         float: {

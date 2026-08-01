@@ -1,12 +1,12 @@
-import { PeachIcon } from "@/components/PeachIcon";
+import { AcornIcon } from "@/components/AcornIcon";
 
-/** Peach wordmark: peach glyph + "Peach" in a friendly rounded type. */
+/** Acorn wordmark: acorn glyph + "Acorn" in a friendly rounded type. */
 export function Logo({ size = 30, className = "" }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <PeachIcon size={size} />
+      <AcornIcon size={size} />
       <span className="text-xl font-bold tracking-tight text-slate-800">
-        Peach
+        Acorn
       </span>
     </span>
   );
