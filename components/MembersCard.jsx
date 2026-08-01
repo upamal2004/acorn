@@ -1,10 +1,32 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { computeMemberStats } from "@/lib/summary";
 import { formatMoney } from "@/lib/money";
 
-/** Member list with who still owes money to the room. */
-export function MembersCard({ members, currentUserId, expenses }) {
+/** Member list with who still owes money to the room. The room creator sees a
+ *  "Remove" action on every other member; everyone can see the creator badge. */
+export function MembersCard({ members, currentUserId, ownerId, expenses }) {
+  const router = useRouter();
+  const [busyId, setBusyId] = useState(null);
   const stats = computeMemberStats(members, expenses);
+  const isAdmin = ownerId === currentUserId;
+
+  async function remove(member) {
+    if (!window.confirm(`Remove ${member.name} from the room? They'll go back to solo mode.`)) return;
+    setBusyId(member.id);
+    try {
+      const res = await fetch(`/api/rooms/${member.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not remove member.");
+      router.refresh();
+    } catch (err) {
+      alert(err.message);
+      setBusyId(null);
+    }
+  }
 
   if (!members.length) {
     return (
@@ -28,6 +50,7 @@ export function MembersCard({ members, currentUserId, expenses }) {
         {members.map((m) => {
           const s = stats[m.id] || { owes: 0, owedTo: 0, pendingCount: 0 };
           const isMe = m.id === currentUserId;
+          const isCreator = m.id === ownerId;
           const owes = s.owes > 0;
 
           return (
@@ -37,6 +60,11 @@ export function MembersCard({ members, currentUserId, expenses }) {
                 <p className="truncate text-sm font-medium text-slate-800">
                   {m.name}
                   {isMe && <span className="ml-1.5 text-xs text-slate-400">(you)</span>}
+                  {isCreator && (
+                    <span className="ml-1.5 rounded bg-acorn-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-acorn-700">
+                      creator
+                    </span>
+                  )}
                 </p>
                 <p
                   className={`text-xs ${
@@ -58,6 +86,16 @@ export function MembersCard({ members, currentUserId, expenses }) {
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                   {s.pendingCount}
                 </span>
+              )}
+              {isAdmin && !isMe && (
+                <button
+                  onClick={() => remove(m)}
+                  disabled={busyId === m.id}
+                  title={`Remove ${m.name}`}
+                  className="btn-ghost px-2 py-1 text-xs text-slate-400 transition hover:text-red-600"
+                >
+                  {busyId === m.id ? "…" : "Remove"}
+                </button>
               )}
             </li>
           );

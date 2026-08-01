@@ -54,6 +54,24 @@ export function Dashboard({ user, room, members, expenses }) {
     setToast({ type, message });
   }
 
+  async function leaveRoom() {
+    if (
+      !window.confirm(
+        "Leave this room? You'll go back to personal mode and can join or create another room anytime."
+      )
+    )
+      return;
+    try {
+      const res = await fetch("/api/rooms/leave", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not leave the room.");
+      showToast("success", "You left the room.");
+      router.refresh();
+    } catch (err) {
+      showToast("error", err.message);
+    }
+  }
+
   async function signOut() {
     await fetch("/api/auth/signout", { method: "POST" });
     router.push("/login");
@@ -114,6 +132,15 @@ export function Dashboard({ user, room, members, expenses }) {
             )}
           </div>
           <div className="flex gap-2">
+            {room && (
+              <button
+                onClick={leaveRoom}
+                className="btn-ghost text-red-500 hover:bg-red-50 hover:text-red-600"
+                title="Leave this room"
+              >
+                <DoorIcon /> Leave room
+              </button>
+            )}
             {expenses.length > 0 && (
               <button
                 onClick={() => setHistoryOpen(true)}
@@ -149,6 +176,7 @@ export function Dashboard({ user, room, members, expenses }) {
                 <MembersCard
                   members={members}
                   currentUserId={user.id}
+                  ownerId={room.ownerId}
                   expenses={expenses}
                 />
               </>
@@ -236,6 +264,20 @@ function CalendarIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function DoorIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M13 4v3a1 1 0 0 0 1 1h3M13 8h3M4 4h8l6 6v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
