@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AcornIcon } from "@/components/AcornIcon";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/auth";
 
@@ -23,7 +22,14 @@ export default async function Home() {
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-6 py-16 text-center">
         <div className="mb-6 animate-float">
-          <AcornIcon size={96} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/cover.png"
+            alt="Acorn cover"
+            width={160}
+            height={160}
+            className="rounded-3xl object-cover shadow-soft"
+          />
         </div>
 
         <h1 className="max-w-2xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-6xl">

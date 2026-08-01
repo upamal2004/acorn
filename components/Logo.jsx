@@ -1,13 +1,22 @@
-import { AcornIcon } from "@/components/AcornIcon";
-
-/** Acorn wordmark: acorn glyph + "Acorn" in a friendly rounded type. */
+/** Acorn logo lockup: cover mark + wordmark image. */
 export function Logo({ size = 30, className = "" }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <AcornIcon size={size} />
-      <span className="text-xl font-bold tracking-tight text-slate-800">
-        Acorn
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/cover.png"
+        alt=""
+        width={size}
+        height={size}
+        className="h-auto w-auto rounded-lg object-cover"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/name.png"
+        alt="Acorn"
+        className="h-auto w-auto object-contain"
+        style={{ height: Math.max(12, Math.round(size * 0.55)) }}
+      />
     </span>
   );
 }
