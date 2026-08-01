@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
@@ -11,13 +11,48 @@ import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseModal } from "@/components/ExpenseModal";
 import { ExpenseHistory } from "@/components/ExpenseHistory";
+import { SettingsModal } from "@/components/SettingsModal";
+
+const POLL_INTERVAL_MS = 5000;
 
 /** Main signed-in screen. Server-rendered data is passed in and kept in sync
- *  with `router.refresh()` after mutations. */
+ *  with `router.refresh()` after mutations and on a live polling loop, so any
+ *  change by another member (expense added/deleted/settled, wallet updates)
+ *  shows up automatically without a manual refresh. */
 export function Dashboard({ user, room, members, expenses }) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Live updates: poll the server-rendered data while the tab is visible.
+  useEffect(() => {
+    const tick = () => {
+      if (document.visibilityState === "hidden") return;
+      router.refresh();
+    };
+    const id = setInterval(tick, POLL_INTERVAL_MS);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [router]);
+
+  // Auto-dismiss toasts.
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  function showToast(type, message) {
+    setToast({ type, message });
+  }
 
   async function signOut() {
     await fetch("/api/auth/signout", { method: "POST" });
@@ -30,7 +65,9 @@ export function Dashboard({ user, room, members, expenses }) {
       {/* Top bar */}
       <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3.5">
-          <Logo size={26} />
+          <Link href="/dashboard" aria-label="Acorn dashboard">
+            <Logo size={26} />
+          </Link>
           <div className="flex items-center gap-3">
             {room && (
               <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
@@ -38,6 +75,13 @@ export function Dashboard({ user, room, members, expenses }) {
               </span>
             )}
             <Avatar name={user.name} image={user.image} size={32} />
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="btn-ghost px-2.5 py-2"
+              title="Account settings"
+            >
+              <GearIcon />
+            </button>
             <button
               onClick={signOut}
               className="btn-ghost px-3 py-1.5 text-xs"
@@ -152,6 +196,26 @@ export function Dashboard({ user, room, members, expenses }) {
           onClose={() => setHistoryOpen(false)}
         />
       )}
+
+      {settingsOpen && (
+        <SettingsModal
+          user={user}
+          onClose={() => setSettingsOpen(false)}
+          onToast={showToast}
+        />
+      )}
+
+      {toast && (
+        <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4">
+          <div
+            className={`max-w-md rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg ${
+              toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
+            }`}
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -172,6 +236,26 @@ function CalendarIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function GearIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.35a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.03Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
