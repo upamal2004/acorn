@@ -52,10 +52,10 @@ export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
         className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-white sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <div>
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
+          <div className="min-w-0">
             <h2 className="text-lg font-bold text-slate-900">Expense history</h2>
-            <p className="mt-0.5 text-xs text-slate-400">
+            <p className="mt-0.5 break-words text-xs text-slate-400">
               Your personal share of each expense.
             </p>
           </div>
@@ -73,7 +73,7 @@ export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
             <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-3">
               <label className="text-sm font-medium text-slate-600">Week</label>
               <select
-                className="input w-auto flex-1 sm:max-w-xs"
+                className="input min-w-0 w-auto flex-1 sm:max-w-xs"
                 value={weekIndex}
                 onChange={(e) => setWeekIndex(Number(e.target.value))}
               >
@@ -97,14 +97,14 @@ export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
                 <div className="space-y-5">
                   {days.map((day) => (
                     <div key={day.dateKey}>
-                      <div className="mb-2 flex items-center justify-between">
-                        <p className="text-sm font-semibold text-slate-800">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <p className="min-w-0 break-words text-sm font-semibold text-slate-800">
                           {day.dayName}
                           <span className="ml-2 text-xs font-normal text-slate-400">
                             {day.dateLabel}
                           </span>
                         </p>
-                        <span className="text-xs font-semibold text-slate-500">
+                        <span className="flex-none text-xs font-semibold text-slate-500">
                           {formatMoney(day.total)}
                         </span>
                       </div>

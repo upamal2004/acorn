@@ -45,7 +45,7 @@ export function WalletCard({ user }) {
       </div>
 
       {editing ? (
-        <form onSubmit={save} className="flex items-center gap-2">
+        <form onSubmit={save} className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold text-slate-700">Rs.</span>
           <input
             className="input w-36"

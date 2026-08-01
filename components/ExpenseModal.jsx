@@ -98,7 +98,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
             />
           </div>
 
-          <div className={`grid gap-3 ${isPersonal ? "grid-cols-1" : "grid-cols-2"}`}>
+          <div className={`grid gap-3 ${isPersonal ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">
                 Total amount
@@ -158,9 +158,9 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
                       onChange={() => toggle(m.id)}
                     />
                     <Avatar name={m.name} image={m.image} size={26} />
-                    <span className="text-sm text-slate-700">{m.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{m.name}</span>
                     {m.id === currentUserId && (
-                      <span className="ml-auto text-xs font-medium text-slate-400">
+                      <span className="ml-auto flex-none text-xs font-medium text-slate-400">
                         you
                       </span>
                     )}

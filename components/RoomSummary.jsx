@@ -43,12 +43,12 @@ export function RoomSummary({ expenses, members, currentUserId }) {
                 {youOweList.map(([uid, amt]) => (
                   <li
                     key={uid}
-                    className="flex items-center justify-between rounded-lg bg-red-50 px-3 py-1.5 text-sm"
+                    className="flex items-center justify-between gap-2 rounded-lg bg-red-50 px-3 py-1.5 text-sm"
                   >
-                    <span className="font-medium text-slate-700">
+                    <span className="min-w-0 flex-1 truncate font-medium text-slate-700">
                       {nameById[uid] || "Someone"}
                     </span>
-                    <span className="font-semibold text-red-600">{formatMoney(amt)}</span>
+                    <span className="flex-none font-semibold text-red-600">{formatMoney(amt)}</span>
                   </li>
                 ))}
               </ul>
@@ -64,12 +64,12 @@ export function RoomSummary({ expenses, members, currentUserId }) {
                 {owedToList.map(([uid, amt]) => (
                   <li
                     key={uid}
-                    className="flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-1.5 text-sm"
+                    className="flex items-center justify-between gap-2 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm"
                   >
-                    <span className="font-medium text-slate-700">
+                    <span className="min-w-0 flex-1 truncate font-medium text-slate-700">
                       {nameById[uid] || "Someone"}
                     </span>
-                    <span className="font-semibold text-emerald-600">{formatMoney(amt)}</span>
+                    <span className="flex-none font-semibold text-emerald-600">{formatMoney(amt)}</span>
                   </li>
                 ))}
               </ul>

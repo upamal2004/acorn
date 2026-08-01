@@ -151,7 +151,7 @@ export function Dashboard({
           <Link href="/dashboard" aria-label="Acorn dashboard">
             <Logo size={26} />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
             {room && (
               <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
                 {room.code}
@@ -179,7 +179,7 @@ export function Dashboard({
       <main className="mx-auto w-full max-w-5xl px-6 py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="break-words text-2xl font-bold text-slate-900">
               {room?.name ?? "Your personal space"}
             </h1>
             {room ? (
@@ -196,7 +196,7 @@ export function Dashboard({
               </p>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {room && (
               <button
                 onClick={leaveRoom}
@@ -221,7 +221,7 @@ export function Dashboard({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="min-w-0 space-y-6 lg:col-span-2">
             <WalletCard user={user} />
             <ExpenseList
               expenses={expenses}
@@ -231,7 +231,7 @@ export function Dashboard({
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             {room ? (
               <>
                 <RoomSummary
@@ -304,7 +304,7 @@ export function Dashboard({
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4">
           <div
-            className={`max-w-md rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg ${
+            className={`w-full max-w-md rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg ${
               toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
             }`}
           >

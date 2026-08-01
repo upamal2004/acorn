@@ -82,7 +82,7 @@ export function MembersCard({ members, currentUserId, ownerId, expenses, onChang
                 </p>
               </div>
               {s.pendingCount > 0 && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                <span className="flex-none rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                   {s.pendingCount}
                 </span>
               )}
@@ -91,7 +91,7 @@ export function MembersCard({ members, currentUserId, ownerId, expenses, onChang
                   onClick={() => remove(m)}
                   disabled={busyId === m.id}
                   title={`Remove ${m.name}`}
-                  className="btn-ghost px-2 py-1 text-xs text-slate-400 transition hover:text-red-600"
+                  className="btn-ghost flex-none whitespace-nowrap px-2 py-1 text-xs text-slate-400 transition hover:text-red-600"
                 >
                   {busyId === m.id ? "…" : "Remove"}
                 </button>

@@ -127,7 +127,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-right">
+        <div className="flex flex-none flex-wrap items-center justify-end gap-2 text-right">
           <div>
             <p className="text-sm font-bold text-slate-800">
               {mySplit ? formatMoney(mySplit.amount) : "—"}

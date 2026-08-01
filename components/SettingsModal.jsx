@@ -70,8 +70,8 @@ export function SettingsModal({ user, onClose, onToast }) {
           </button>
         </div>
 
-        <p className="mb-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-          Signed in as <span className="font-semibold text-slate-800">{user.email}</span>
+        <p className="mb-5 break-words rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Signed in as <span className="font-semibold break-all text-slate-800">{user.email}</span>
         </p>
 
         <form onSubmit={submit} className="space-y-4">
