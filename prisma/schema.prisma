@@ -28,6 +28,7 @@ model User {
   room         Room?          @relation("Membership", fields: [roomId], references: [id])
   ownedRooms   Room[]         @relation("Owned")
   expensesPaid Expense[]      @relation("PaidBy")
+  expensesCreated Expense[]   @relation("CreatedBy")
   shares       ExpenseShare[]
 
   @@index([roomId])
@@ -53,10 +54,12 @@ model Expense {
   title     String
   amount    Int      // total, in cents
   paidBy    String
+  createdBy String   // who added this entry (only they may delete it)
   createdAt DateTime @default(now())
 
   room   Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
   payer  User           @relation("PaidBy", fields: [paidBy], references: [id])
+  creator User          @relation("CreatedBy", fields: [createdBy], references: [id])
   shares ExpenseShare[]
 }
 

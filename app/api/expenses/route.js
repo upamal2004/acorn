@@ -38,6 +38,7 @@ export async function POST(req) {
     title,
     amount: parsedAmount,
     paidBy,
+    createdBy: user.id,
     splitBetween: cleanSplit,
   });
 

@@ -87,7 +87,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                  $
+                  Rs.
                 </span>
                 <input
                   className="input pl-7"
