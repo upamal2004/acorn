@@ -3,23 +3,33 @@
 import { useMemo, useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { formatMoney } from "@/lib/money";
-import { groupExpensesByWeek, groupExpensesByDay } from "@/lib/history";
+import {
+  groupExpensesByWeek,
+  groupExpensesByDay,
+  personalAmount,
+} from "@/lib/history";
 
 /**
  * "Expense history" modal: pick a week, see that week's expenses grouped by
- * day (e.g. "Tuesday → Breakfast: Rs. 150, Lunch: Rs. 250"). The list is
- * pre-filtered by the dashboard to the logged-in user's own activity, so only
- * the expenses they added, paid for, or were split into are shown.
+ * day (e.g. "Tuesday → Breakfast: Rs. 75, Lunch: Rs. 250"). The list is
+ * pre-filtered by the dashboard to the logged-in user's own activity, and
+ * every amount is the user's personal share — never the full bill or the
+ * combined room total.
  */
 export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
-  const nameById = useMemo(
-    () => Object.fromEntries(members.map((m) => [m.id, m.name])),
-    [members]
+  const me = members.find((m) => m.id === currentUserId);
+
+  // Replace each expense's amount with the logged-in user's personal share so
+  // the weekly total, the per-day totals and each row all reflect only their
+  // own money.
+  const myView = useMemo(
+    () => expenses.map((exp) => ({ ...exp, amount: personalAmount(exp, currentUserId) })),
+    [expenses, currentUserId]
   );
 
   const weeks = useMemo(
-    () => groupExpensesByWeek(expenses, { weeks: 12 }),
-    [expenses]
+    () => groupExpensesByWeek(myView, { weeks: 12 }),
+    [myView]
   );
   const [weekIndex, setWeekIndex] = useState(weeks.length - 1); // newest week
 
@@ -46,7 +56,7 @@ export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
           <div>
             <h2 className="text-lg font-bold text-slate-900">Expense history</h2>
             <p className="mt-0.5 text-xs text-slate-400">
-              Your activity only — expenses you added or were split into.
+              Your personal share of each expense.
             </p>
           </div>
           <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">
@@ -104,10 +114,7 @@ export function ExpenseHistory({ expenses, members, currentUserId, onClose }) {
                             key={exp.id}
                             className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2"
                           >
-                            <Avatar
-                              name={nameById[exp.paidBy] || "?"}
-                              size={26}
-                            />
+                            <Avatar name={me?.name || "You"} size={26} />
                             <span className="min-w-0 flex-1 truncate text-sm text-slate-700">
                               {exp.title}
                             </span>
