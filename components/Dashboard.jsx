@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { WalletCard } from "@/components/WalletCard";
@@ -110,9 +111,16 @@ export function Dashboard({
     }
   }
 
-  async function signOut() {
-    await fetch("/api/auth/signout", { method: "POST" });
-    router.push("/login");
+  async function handleSignOut() {
+    // next-auth's signOut fetches a CSRF token, POSTs it to /api/auth/signout
+    // (clearing the session cookie server-side), then hard-navigates to /login.
+    // The old manual fetch skipped the CSRF step, so the session never ended and
+    // /login bounced straight back to /dashboard.
+    try {
+      await signOut({ callbackUrl: "/login" });
+    } catch {
+      showToast("error", "Could not sign out. Please try again.");
+    }
   }
 
   return (
@@ -138,7 +146,7 @@ export function Dashboard({
               <GearIcon />
             </button>
             <button
-              onClick={signOut}
+              onClick={handleSignOut}
               className="btn-ghost px-3 py-1.5 text-xs"
               title="Sign out"
             >
