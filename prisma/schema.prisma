@@ -24,11 +24,13 @@ model User {
 
   // Peach domain
   balance      Int            @default(0) // wallet, in cents
-  roomId       String?        @unique
+  roomId       String?
   room         Room?          @relation("Membership", fields: [roomId], references: [id])
   ownedRooms   Room[]         @relation("Owned")
   expensesPaid Expense[]      @relation("PaidBy")
   shares       ExpenseShare[]
+
+  @@index([roomId])
 }
 
 // --- Peach domain -----------------------------------------------------------
