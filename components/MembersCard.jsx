@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { computeMemberStats } from "@/lib/summary";
 import { formatMoney } from "@/lib/money";
 
 /** Member list with who still owes money to the room. The room creator sees a
- *  "Remove" action on every other member; everyone can see the creator badge. */
-export function MembersCard({ members, currentUserId, ownerId, expenses }) {
-  const router = useRouter();
+ *  "Remove" action on every other member; everyone can see the creator badge.
+ *  Removal fires `onChanged` so the dashboard refreshes via AJAX. */
+export function MembersCard({ members, currentUserId, ownerId, expenses, onChanged }) {
   const [busyId, setBusyId] = useState(null);
   const stats = computeMemberStats(members, expenses);
   const isAdmin = ownerId === currentUserId;
@@ -21,7 +20,7 @@ export function MembersCard({ members, currentUserId, ownerId, expenses }) {
       const res = await fetch(`/api/rooms/${member.id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not remove member.");
-      router.refresh();
+      onChanged();
     } catch (err) {
       alert(err.message);
       setBusyId(null);

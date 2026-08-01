@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { formatMoney } from "@/lib/money";
 import { PENDING, PAID } from "@/lib/summary";
 
-/** Chronological list of the room's expenses with settle-one-tap buttons. */
-export function ExpenseList({ expenses, members, currentUserId }) {
+/** Chronological list of the room's expenses with settle-one-tap buttons.
+ *  After a settle/delete the parent's `onChanged` is fired so the AJAX
+ *  refresh (no page reload) picks up the new balances. */
+export function ExpenseList({ expenses, members, currentUserId, onChanged }) {
   if (!expenses.length) {
     return (
       <section className="card border-dashed text-center">
@@ -33,6 +34,7 @@ export function ExpenseList({ expenses, members, currentUserId }) {
             expense={exp}
             members={members}
             currentUserId={currentUserId}
+            onChanged={onChanged}
           />
         ))}
       </ul>
@@ -40,8 +42,7 @@ export function ExpenseList({ expenses, members, currentUserId }) {
   );
 }
 
-function ExpenseRow({ expense, members, currentUserId }) {
-  const router = useRouter();
+function ExpenseRow({ expense, members, currentUserId, onChanged }) {
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
@@ -59,7 +60,7 @@ function ExpenseRow({ expense, members, currentUserId }) {
         method: "POST",
       });
       if (!res.ok) throw new Error("Could not settle — try again.");
-      router.refresh();
+      onChanged();
     } catch (err) {
       alert(err.message);
       setBusy(false);
@@ -73,7 +74,7 @@ function ExpenseRow({ expense, members, currentUserId }) {
       const res = await fetch(`/api/expenses/${expense.id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not delete.");
-      router.refresh();
+      onChanged();
     } catch (err) {
       alert(err.message);
       setDeleting(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
@@ -15,33 +15,71 @@ import { SettingsModal } from "@/components/SettingsModal";
 
 const POLL_INTERVAL_MS = 5000;
 
-/** Main signed-in screen. Server-rendered data is passed in and kept in sync
- *  with `router.refresh()` after mutations and on a live polling loop, so any
- *  change by another member (expense added/deleted/settled, wallet updates)
- *  shows up automatically without a manual refresh. */
-export function Dashboard({ user, room, members, expenses }) {
+/** Main signed-in screen. Server-rendered data seeds the client state, then
+ *  everything is kept in sync with silent AJAX fetches of /api/dashboard — on
+ *  a visibility-aware polling loop and after every mutation — so changes by
+ *  another member show up without reloading the page. */
+export function Dashboard({
+  user: initialUser,
+  room: initialRoom,
+  members: initialMembers,
+  expenses: initialExpenses,
+}) {
   const router = useRouter();
+  const [data, setData] = useState({
+    user: initialUser,
+    room: initialRoom,
+    members: initialMembers,
+    expenses: initialExpenses,
+  });
+  const { user, room, members, expenses } = data;
   const [modalOpen, setModalOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState(null);
+  const inflight = useRef(false);
 
-  // Live updates: poll the server-rendered data while the tab is visible.
+  /** Pull the freshest data from the database without touching the DOM. */
+  const refresh = useCallback(async () => {
+    if (inflight.current) return;
+    inflight.current = true;
+    try {
+      const res = await fetch("/api/dashboard");
+      if (res.status === 401) {
+        router.push("/login");
+        return;
+      }
+      if (!res.ok) return;
+      const payload = await res.json();
+      setData({
+        user: payload.user,
+        room: payload.room,
+        members: payload.members,
+        expenses: payload.expenses,
+      });
+    } catch {
+      // Transient network error — keep showing the last known data.
+    } finally {
+      inflight.current = false;
+    }
+  }, [router]);
+
+  // Live updates: silently re-fetch while the tab is visible, and once more
+  // when it becomes visible again after being hidden.
   useEffect(() => {
-    const tick = () => {
+    const id = setInterval(() => {
       if (document.visibilityState === "hidden") return;
-      router.refresh();
-    };
-    const id = setInterval(tick, POLL_INTERVAL_MS);
+      refresh();
+    }, POLL_INTERVAL_MS);
     const onVisible = () => {
-      if (document.visibilityState === "visible") router.refresh();
+      if (document.visibilityState === "visible") refresh();
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
       clearInterval(id);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [router]);
+  }, [refresh]);
 
   // Auto-dismiss toasts.
   useEffect(() => {
@@ -66,7 +104,7 @@ export function Dashboard({ user, room, members, expenses }) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not leave the room.");
       showToast("success", "You left the room.");
-      router.refresh();
+      refresh();
     } catch (err) {
       showToast("error", err.message);
     }
@@ -75,7 +113,6 @@ export function Dashboard({ user, room, members, expenses }) {
   async function signOut() {
     await fetch("/api/auth/signout", { method: "POST" });
     router.push("/login");
-    router.refresh();
   }
 
   return (
@@ -162,6 +199,7 @@ export function Dashboard({ user, room, members, expenses }) {
               expenses={expenses}
               members={members}
               currentUserId={user.id}
+              onChanged={refresh}
             />
           </div>
 
@@ -178,6 +216,7 @@ export function Dashboard({ user, room, members, expenses }) {
                   currentUserId={user.id}
                   ownerId={room.ownerId}
                   expenses={expenses}
+                  onChanged={refresh}
                 />
               </>
             ) : (
@@ -212,7 +251,7 @@ export function Dashboard({ user, room, members, expenses }) {
           onClose={() => setModalOpen(false)}
           onSaved={() => {
             setModalOpen(false);
-            router.refresh();
+            refresh();
           }}
         />
       )}
