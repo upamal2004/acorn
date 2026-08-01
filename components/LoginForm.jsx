@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { PasswordInput } from "./PasswordInput";
 
 /** Email/password sign-in. On success the session cookie is set and the
  *  router sends the user onward. */
@@ -52,12 +54,18 @@ export function LoginForm() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-          Password
-        </label>
-        <input
-          className="input"
-          type="password"
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-sm font-medium text-slate-700">
+            Password
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-sm font-medium text-acorn-600 hover:text-acorn-700"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <PasswordInput
           autoComplete="current-password"
           placeholder="••••••••"
           value={password}

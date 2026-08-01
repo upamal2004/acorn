@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PasswordInput } from "./PasswordInput";
 
 /** Account settings modal — lets a signed-in (credentials) user change their
  *  password safely. Current password is verified server-side; new password is
@@ -78,9 +79,7 @@ export function SettingsModal({ user, onClose, onToast }) {
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               Current password
             </label>
-            <input
-              className="input"
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
               placeholder="••••••••"
               value={current}
@@ -94,9 +93,7 @@ export function SettingsModal({ user, onClose, onToast }) {
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               New password
             </label>
-            <input
-              className="input"
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               placeholder="At least 8 characters"
               value={next}
@@ -110,9 +107,7 @@ export function SettingsModal({ user, onClose, onToast }) {
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               Confirm new password
             </label>
-            <input
-              className="input"
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               placeholder="Repeat the new password"
               value={confirm}

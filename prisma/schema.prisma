@@ -31,6 +31,10 @@ model User {
   expensesCreated Expense[]   @relation("CreatedBy")
   shares       ExpenseShare[]
 
+  // Password reset (hashed token + expiry)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
   @@index([roomId])
 }
 

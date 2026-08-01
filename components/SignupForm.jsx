@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "./PasswordInput";
 
 /** Email/password sign-up: creates the account, then signs in automatically
  *  and sends the user to their (personal-mode) dashboard. */
@@ -81,9 +82,7 @@ export function SignupForm() {
         <label className="mb-1.5 block text-sm font-medium text-slate-700">
           Password
         </label>
-        <input
-          className="input"
-          type="password"
+        <PasswordInput
           autoComplete="new-password"
           placeholder="At least 8 characters"
           value={password}
