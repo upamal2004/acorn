@@ -10,6 +10,8 @@
 import { ok, bad, requireUser } from "@/lib/api";
 import { isRoomMember, getMembers, createExpense } from "@/lib/queries";
 import { isValidCategory } from "@/lib/categories";
+import { sendPushToUsers } from "@/lib/push";
+import { formatMoney, toCents, fromCents } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +60,18 @@ export async function POST(req) {
     createdBy: user.id,
     splitBetween: cleanSplit,
   });
+
+  // Notify all split members (except the creator) about the new expense.
+  const notifyUserIds = cleanSplit.filter((id) => id !== user.id);
+  if (notifyUserIds.length) {
+    const perShare = Math.round(toCents(parsedAmount) / cleanSplit.length);
+    sendPushToUsers(notifyUserIds, {
+      title: "New expense added",
+      body: `${title} — ${formatMoney(parsedAmount)} split ${cleanSplit.length} ways. Your share: ${formatMoney(fromCents(perShare))}.`,
+      tag: `expense-${expenseId}`,
+      url: "/dashboard",
+    }).catch(() => {});
+  }
 
   return ok({ expenseId });
 }

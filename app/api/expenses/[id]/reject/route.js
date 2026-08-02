@@ -3,6 +3,8 @@
 // changes (none were made while it was awaiting approval).
 import { ok, bad, requireUser } from "@/lib/api";
 import { rejectShare } from "@/lib/queries";
+import { prisma } from "@/lib/db";
+import { sendPushToUser } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,21 @@ export async function POST(req, { params }) {
 
   try {
     await rejectShare({ expenseId: id, uid: userId, rejectBy: user.id });
+
+    // Notify the settling member that their payment was rejected.
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      select: { title: true },
+    });
+    if (expense) {
+      sendPushToUser(userId, {
+        title: "Payment rejected",
+        body: `Your payment for "${expense.title}" was rejected by ${user.name}. Please settle again.`,
+        tag: `reject-${id}`,
+        url: "/dashboard",
+      }).catch(() => {});
+    }
+
     return ok();
   } catch (err) {
     if (err.message === "EXPENSE_NOT_FOUND") return bad("Expense not found.", 404);

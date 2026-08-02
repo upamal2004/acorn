@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { PushManager } from "@/components/PushManager";
 
 export const metadata = {
   title: "Acorn · Split rent, bills & groceries with roommates",
@@ -18,7 +19,10 @@ export const metadata = {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PushManager />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

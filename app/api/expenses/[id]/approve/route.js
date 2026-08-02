@@ -4,6 +4,8 @@
 // share and the payer's wallet rises by that share.
 import { ok, bad, requireUser } from "@/lib/api";
 import { approveShare } from "@/lib/queries";
+import { prisma } from "@/lib/db";
+import { sendPushToUser } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +21,21 @@ export async function POST(req, { params }) {
 
   try {
     await approveShare({ expenseId: id, uid: userId, approveBy: user.id });
+
+    // Notify the settling member that their payment was approved.
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      select: { title: true },
+    });
+    if (expense) {
+      sendPushToUser(userId, {
+        title: "Payment approved",
+        body: `Your payment for "${expense.title}" has been approved by ${user.name}.`,
+        tag: `approve-${id}`,
+        url: "/dashboard",
+      }).catch(() => {});
+    }
+
     return ok();
   } catch (err) {
     if (err.message === "EXPENSE_NOT_FOUND") return bad("Expense not found.", 404);

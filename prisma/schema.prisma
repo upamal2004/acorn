@@ -30,6 +30,7 @@ model User {
   expensesPaid Expense[]      @relation("PaidBy")
   expensesCreated Expense[]   @relation("CreatedBy")
   shares       ExpenseShare[]
+  pushSubscriptions PushSubscription[]
 
   // Password reset (hashed token + expiry)
   resetToken       String?
@@ -98,4 +99,19 @@ enum ExpenseCategory {
   MEDICAL
   RENT
   OTHERS
+}
+
+// Web Push subscriptions — one row per device/browser per user.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([endpoint])
+  @@index([userId])
 }

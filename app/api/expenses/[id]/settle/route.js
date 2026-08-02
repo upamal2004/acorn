@@ -5,6 +5,8 @@
 // their own part.
 import { ok, bad, requireUser } from "@/lib/api";
 import { markSharePendingVerification } from "@/lib/queries";
+import { prisma } from "@/lib/db";
+import { sendPushToUser } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,21 @@ export async function POST(_req, { params }) {
   const { id } = await params;
   try {
     await markSharePendingVerification({ expenseId: id, uid: user.id });
+
+    // Notify the expense payer that a member has marked their share as paid.
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      select: { title: true, paidBy: true },
+    });
+    if (expense && expense.paidBy !== user.id) {
+      sendPushToUser(expense.paidBy, {
+        title: "Settlement awaiting approval",
+        body: `${user.name} marked their share of "${expense.title}" as paid. Tap to approve or reject.`,
+        tag: `settle-${id}`,
+        url: "/dashboard",
+      }).catch(() => {});
+    }
+
     return ok();
   } catch (err) {
     if (err.message === "SHARE_NOT_FOUND") {

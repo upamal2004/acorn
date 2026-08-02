@@ -1,1 +1,22 @@
-{"name":"Acorn","short_name":"Acorn","icons":[{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"theme_color":"#AC7138","background_color":"#FAF6EF","display":"standalone"}
+{
+  "name": "Acorn · Split expenses with roommates",
+  "short_name": "Acorn",
+  "description": "Split rent, bills and groceries with roommates. See who owes whom, and settle it in one tap.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#AC7138",
+  "background_color": "#FAF6EF",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
