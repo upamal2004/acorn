@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { WalletCard } from "@/components/WalletCard";
+import { DailySpendingBar } from "@/components/DailySpendingBar";
 import { RoomSummary } from "@/components/RoomSummary";
 import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
@@ -173,6 +174,11 @@ export function Dashboard({
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="min-w-0 space-y-6 lg:col-span-2">
+            <DailySpendingBar
+              user={user}
+              expenses={expenses}
+              onToast={showToast}
+            />
             <WalletCard user={user} />
             <ExpenseList
               expenses={activeExpenses}
