@@ -35,7 +35,7 @@ export function AboutPage({ user }) {
           <div className="mt-3 space-y-3 text-sm text-slate-600 leading-relaxed">
             <p>
               Acorn is a smart expense-splitting app designed for roommates, friends, and families.
-              Track shared expenses, settle debts, and monitor your spending habits -- all in one place.
+              Track shared expenses, settle debts, and monitor your spending habits, all in one place.
             </p>
             <p>
               Whether it&apos;s rent, groceries, utilities, or that midnight food run, Acorn makes it
