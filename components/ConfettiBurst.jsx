@@ -49,3 +49,54 @@ export function successBurst() {
     });
   } catch { /* noop */ }
 }
+
+/** Gold & green celebration burst for receiving money / settling debts. */
+export function celebrationBurst() {
+  try {
+    // Gold coins falling
+    confetti({
+      particleCount: 60,
+      spread: 90,
+      startVelocity: 30,
+      origin: { y: 0.5 },
+      colors: ["#F59E0B", "#D97706", "#B45309", "#10B981", "#059669"],
+      shapes: ["circle"],
+      scalar: 1.2,
+    });
+    // Green sparkles from sides
+    setTimeout(() => {
+      confetti({
+        particleCount: 30,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.65 },
+        colors: ["#10B981", "#34D399", "#6EE7B7"],
+      });
+      confetti({
+        particleCount: 30,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.65 },
+        colors: ["#10B981", "#34D399", "#6EE7B7"],
+      });
+    }, 200);
+  } catch { /* noop */ }
+}
+
+/** Sad trombone effect — subtle orange/red particles fading down for spending. */
+export function spendBurst() {
+  try {
+    confetti({
+      particleCount: 20,
+      spread: 40,
+      startVelocity: 15,
+      gravity: 1.5,
+      origin: { y: 0.6 },
+      colors: ["#F97316", "#EA580C", "#FB923C"],
+      shapes: ["circle"],
+      scalar: 0.8,
+      drift: 0,
+      ticks: 80,
+    });
+  } catch { /* noop */ }
+}

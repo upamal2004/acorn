@@ -33,7 +33,7 @@ export function WalletCard({ user }) {
   }
 
   return (
-    <section className="card flex flex-wrap items-center justify-between gap-4">
+    <section className="card card-hover flex flex-wrap items-center justify-between gap-4">
       <div>
         <p className="text-sm font-medium text-slate-500">My wallet</p>
         <p className="mt-0.5 text-3xl font-bold text-slate-900">

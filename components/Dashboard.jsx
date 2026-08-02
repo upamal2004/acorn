@@ -12,7 +12,7 @@ import { ExpenseList } from "@/components/ExpenseList";
 import { RecentTransactions } from "@/components/RecentTransactions";
 import { ExpenseModal } from "@/components/ExpenseModal";
 import { AnimateIn } from "@/components/AnimateIn";
-import { ConfettiBurst } from "@/components/ConfettiBurst";
+import { celebrationBurst } from "@/components/ConfettiBurst";
 import { computeSummary, isExpenseActiveForUser } from "@/lib/summary";
 
 const POLL_INTERVAL_MS = 5000;
@@ -37,7 +37,6 @@ export function Dashboard({
   const { user, room, members, expenses } = data;
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   const inflight = useRef(false);
 
   // Main "Expenses" feed = only expenses where THIS user still owes money
@@ -134,7 +133,6 @@ export function Dashboard({
 
   return (
     <div className="min-h-screen">
-      <ConfettiBurst fire={showConfetti} />
       <DashboardHeader
         user={user}
         room={room}
@@ -267,8 +265,6 @@ export function Dashboard({
           onClose={() => setModalOpen(false)}
           onSaved={() => {
             setModalOpen(false);
-            setShowConfetti(true);
-            setTimeout(() => setShowConfetti(false), 2000);
             refresh();
           }}
           user={user}

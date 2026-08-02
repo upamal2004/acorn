@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { Avatar } from "@/components/Avatar";
+import { MoneyEmotion } from "@/components/MoneyEmotion";
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import { formatMoney } from "@/lib/money";
 import { personalAmount } from "@/lib/history";
@@ -89,15 +90,10 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
-        {/* Success overlay */}
+        {/* Success overlay with spending emotion */}
         {success && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/95 sm:rounded-2xl">
-            <div className="animate-check-pop flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 12.5l5.5 5.5L20 6.5" />
-              </svg>
-            </div>
-            <p className="mt-3 text-lg font-bold text-slate-900">Expense added!</p>
+            <MoneyEmotion type="spent" amount={parseFloat(amount) || 0} fire={true} />
           </div>
         )}
 

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
+import { MoneyEmotion } from "@/components/MoneyEmotion";
 import { formatMoney } from "@/lib/money";
 import { PENDING_VERIFICATION, PAID } from "@/lib/summary";
 import { categoryMeta } from "@/lib/categories";
 import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
-import { successBurst } from "@/components/ConfettiBurst";
+import { successBurst, celebrationBurst } from "@/components/ConfettiBurst";
 
 /** Chronological list of the expenses involving the signed-in user (the
  *  dashboard feed is filtered server-side to expenses they paid for or were
@@ -15,6 +16,7 @@ import { successBurst } from "@/components/ConfettiBurst";
  *  affordance that opens the full-expense modal. */
 export function ExpenseList({ expenses, members, currentUserId, onChanged, emptyNote }) {
   const [detailExpense, setDetailExpense] = useState(null);
+  const [celebration, setCelebration] = useState(null); // { type: "settled"|"approved", amount }
 
   if (!expenses.length) {
     return (
@@ -92,7 +94,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
         method: "POST",
       });
       if (!res.ok) throw new Error("Could not mark as paid - try again.");
-      successBurst();
+      setCelebration({ type: "settled", amount: mySplit?.amount });
+      celebrationBurst();
       onChanged();
     } catch (err) {
       alert(err.message);
@@ -110,7 +113,10 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not update settlement.");
-      if (action === "approve") successBurst();
+      if (action === "approve") {
+        setCelebration({ type: "approved", amount: expense.splits?.[memberId]?.amount });
+        celebrationBurst();
+      }
       onChanged();
     } catch (err) {
       alert(err.message);
@@ -133,7 +139,18 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
   }
 
   return (
-    <li className="expense-row py-3.5">
+    <li className="expense-row relative py-3.5">
+      {/* Celebration overlay for settled/approved */}
+      {celebration && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/90 receive-emotion">
+          <MoneyEmotion
+            type={celebration.type === "settled" ? "settled" : "received"}
+            amount={celebration.amount}
+            fire={true}
+          />
+        </div>
+      )}
+
       <div className="flex items-center gap-4">
         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-slate-50 text-lg">
           <ExpenseGlyph expense={expense} />

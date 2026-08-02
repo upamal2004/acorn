@@ -207,3 +207,281 @@
 @keyframes stagger-in {
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== Scrat & Acorn Theme Animations ===== */
+
+/* Acorn bouncing while Scrat chases */
+@keyframes acorn-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-12px) rotate(-8deg); }
+  50% { transform: translateY(-6px) rotate(4deg); }
+  70% { transform: translateY(-10px) rotate(-4deg); }
+}
+
+/* Scrat running cycle */
+@keyframes scrat-run {
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  50% { transform: translateX(-2px) scaleX(0.97); }
+}
+
+/* Scrat reaching for acorn */
+@keyframes scrat-reach {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-8deg); }
+}
+
+/* Scrat back leg kick */
+@keyframes scrat-kick {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(12deg); }
+}
+
+/* Scrat tail wag */
+@keyframes scrat-tail {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+
+/* Speed lines fading */
+@keyframes speed-fade {
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 0.1; transform: translateX(-4px); }
+}
+
+/* Excitement pop for "!" */
+@keyframes excitement-pop {
+  0%, 70%, 100% { opacity: 0; transform: scale(0.5); }
+  80% { opacity: 1; transform: scale(1.2); }
+  90% { opacity: 1; transform: scale(0.9); }
+}
+
+/* Scrat waddle (loading) */
+@keyframes scrat-waddle {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-3deg) translateY(-1px); }
+  75% { transform: rotate(3deg) translateY(-1px); }
+}
+
+/* Acorn squeeze (held by Scrat) */
+@keyframes acorn-squeeze {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.92); }
+}
+
+/* Sad acorn wobble */
+@keyframes acorn-sad-wobble {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(0.95) rotate(-2deg); }
+  40% { transform: scale(0.97) rotate(2deg); }
+  60% { transform: scale(0.96) rotate(-1deg); }
+  80% { transform: scale(0.98) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Coins falling away (spending) */
+@keyframes coins-fall {
+  0% { opacity: 0.4; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(20px) rotate(180deg); }
+}
+
+/* Tear falling */
+@keyframes tear-fall {
+  0%, 60% { opacity: 0; transform: translateY(0) scaleY(0.5); }
+  70% { opacity: 0.6; transform: translateY(2px) scaleY(1); }
+  100% { opacity: 0; transform: translateY(10px) scaleY(0.5); }
+}
+
+/* Sweat drop */
+@keyframes sweat-drop {
+  0%, 70% { opacity: 0; transform: translateY(0); }
+  80% { opacity: 0.5; transform: translateY(2px); }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+
+/* Floating away (money leaving) */
+@keyframes float-away {
+  0% { opacity: 0.5; transform: translate(0, 0) rotate(0deg); }
+  100% { opacity: 0; transform: translate(10px, -15px) rotate(20deg); }
+}
+
+/* Sparkle animation */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Glow pulse (for rings) */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.08); }
+}
+
+/* Happy acorn bounce */
+@keyframes acorn-happy-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ===== Enhanced Button Interactions ===== */
+
+.btn-primary {
+  transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 4px rgba(139, 92, 246, 0.2);
+}
+/* Ripple effect */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.btn-primary:active::after {
+  opacity: 1;
+}
+
+.btn-secondary {
+  transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-secondary:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-ghost {
+  transition: all 150ms ease;
+}
+.btn-ghost:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.btn-ghost:active {
+  transform: scale(0.95);
+}
+
+/* ===== Card Hover Effects ===== */
+
+.card-hover {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(139, 92, 246, 0.15);
+}
+
+/* ===== Spending Emotion Animations ===== */
+
+/* Orange fade-out for spending */
+.spend-emotion {
+  animation: spend-fade 0.8s ease-out;
+}
+@keyframes spend-fade {
+  0% { opacity: 1; transform: scale(1); }
+  30% { opacity: 1; transform: scale(0.96); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+
+/* Green celebration for receiving */
+.receive-emotion {
+  animation: receive-glow 0.8s ease-out;
+}
+@keyframes receive-glow {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Success checkmark pop */
+.animate-check-pop {
+  animation: check-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes check-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Float up for amounts */
+@keyframes float-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Money pulse variations */
+@keyframes money-in {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes money-out {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+@keyframes money-success {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* Stagger children utility */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: stagger-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+
+@keyframes stagger-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Splash Screen Scrat ===== */
+
+/* Splash acorn chase - Scrat runs in from left */
+@keyframes scrat-chase-in {
+  0% { transform: translateX(-100px) scaleX(1); }
+  45% { transform: translateX(10px) scaleX(1); }
+  50% { transform: translateX(0) scaleX(1); }
+  55% { transform: translateX(5px) scaleX(-1); }
+  100% { transform: translateX(-100px) scaleX(-1); }
+}
+
+/* Splash acorn drops in */
+@keyframes acorn-drop {
+  0% { transform: translateY(-40px) rotate(-20deg); opacity: 0; }
+  30% { transform: translateY(5px) rotate(5deg); opacity: 1; }
+  50% { transform: translateY(-3px) rotate(-2deg); }
+  70% { transform: translateY(2px) rotate(1deg); }
+  100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+/* Splash text fade in */
+@keyframes splash-text {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
