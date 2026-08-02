@@ -7,7 +7,7 @@ import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
 import { formatMoney } from "@/lib/money";
 import { groupExpensesByDay, personalAmount } from "@/lib/history";
 import { categoryMeta } from "@/lib/categories";
-import { PENDING_VERIFICATION, isExpenseSettled } from "@/lib/summary";
+import { PENDING_VERIFICATION } from "@/lib/summary";
 
 const HISTORY_DAYS = 30;
 
@@ -162,19 +162,29 @@ export function HistoryPage({ user, room, members, expenses }) {
 }
 
 function HistoryStatus({ expense, currentUserId }) {
-  if (isExpenseSettled(expense)) {
+  // Check only the CURRENT user's share — not all members'. If I've paid my
+  // part, this transaction is settled for me regardless of others.
+  const myShare = expense.splits?.[currentUserId];
+  const myPaid = myShare?.status === "PAID";
+
+  if (myPaid) {
     return (
       <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
         Settled ✓
       </span>
     );
   }
-  const awaiting = Object.values(expense.splits || {}).some(
-    (s) => s.status === PENDING_VERIFICATION
-  );
-  if (expense.paidBy === currentUserId && awaiting) {
+  if (myShare?.status === PENDING_VERIFICATION) {
     return (
       <span className="inline-block rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
+        Pending approval
+      </span>
+    );
+  }
+  // I'm the payer and someone else's share is awaiting my verification.
+  if (expense.paidBy === currentUserId && Object.values(expense.splits || {}).some((s) => s.status === PENDING_VERIFICATION)) {
+    return (
+      <span className="inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
         Awaiting verification
       </span>
     );

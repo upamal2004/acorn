@@ -9,7 +9,7 @@ import { RoomSummary } from "@/components/RoomSummary";
 import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseModal } from "@/components/ExpenseModal";
-import { computeSummary, isExpenseActive } from "@/lib/summary";
+import { computeSummary, isExpenseActiveForUser } from "@/lib/summary";
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -35,13 +35,14 @@ export function Dashboard({
   const [toast, setToast] = useState(null);
   const inflight = useRef(false);
 
-  // Main "Expenses" feed = only active (unsettled) expenses: anything still
-  // owed or awaiting verification. Fully settled transactions automatically
-  // drop out of this view and live on the History page. In personal (solo)
-  // mode there are no debts to hide, so everything stays visible.
+  // Main "Expenses" feed = only expenses where THIS user still owes money
+  // or needs to verify a received payment. Once the user has settled their
+  // share, the expense drops out of their feed automatically — even if other
+  // members still owe. In personal (solo) mode there are no debts to hide,
+  // so everything stays visible.
   const activeExpenses = useMemo(
-    () => (room ? expenses.filter(isExpenseActive) : expenses),
-    [expenses, room]
+    () => (room ? expenses.filter((e) => isExpenseActiveForUser(e, user.id)) : expenses),
+    [expenses, room, user.id]
   );
   const allSettled = room && expenses.length > 0 && activeExpenses.length === 0;
 

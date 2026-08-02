@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { PushManager } from "@/components/PushManager";
+import { SplashScreen } from "@/components/SplashScreen";
 
 export const metadata = {
   title: "Acorn · Split rent, bills & groceries with roommates",
@@ -20,6 +21,7 @@ export const metadata = {
     <html lang="en">
       <body>
         <AuthProvider>
+          <SplashScreen />
           <PushManager />
           {children}
         </AuthProvider>
