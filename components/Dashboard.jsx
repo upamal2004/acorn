@@ -185,7 +185,7 @@ export function Dashboard({
               />
             </AnimateIn>
             <AnimateIn index={1}>
-              <WalletCard user={user} />
+              <WalletCard user={user} onToast={showToast} />
             </AnimateIn>
             <AnimateIn index={2}>
               <ExpenseList
