@@ -60,13 +60,13 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
       }`}
       style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
     >
-      {/* Floating card container */}
+      {/* White floating card */}
       <div
-        className={`flex flex-col items-center rounded-2xl border border-slate-700/50 bg-slate-900/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out ${
+        className={`flex flex-col items-center rounded-3xl bg-white p-4 shadow-2xl transition-all duration-300 ease-out max-w-xs ${
           phase === "entering" ? "scale-90 opacity-0" : "scale-100 opacity-100"
         }`}
       >
-        {/* Video */}
+        {/* Video with brightness filter to wash out checkerboard */}
         <video
           ref={videoRef}
           autoPlay
@@ -77,14 +77,15 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
           disablePictureInPicture
           disableRemotePlayback
           preload="auto"
-          className="pointer-events-none w-[300px] max-w-[80vw] max-h-[55vh] rounded-xl object-contain"
+          className="pointer-events-none w-full max-h-[55vh] rounded-2xl object-contain"
+          style={{ filter: "contrast(110%) brightness(130%)" }}
           src={src}
         />
 
         {/* Amount */}
         <p
           className={`mt-4 text-center text-3xl font-bold tracking-tight ${
-            isSpending ? "text-red-400" : "text-emerald-400"
+            isSpending ? "text-red-500" : "text-emerald-500"
           }`}
         >
           {isSpending ? "-" : "+"}Rs. {amount?.toLocaleString() || "0"}
@@ -93,7 +94,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
         {/* Label */}
         <p
           className={`mt-1 text-center text-sm font-medium ${
-            isSpending ? "text-red-300/80" : "text-emerald-300/80"
+            isSpending ? "text-red-400/80" : "text-emerald-400/80"
           }`}
         >
           {label ||
