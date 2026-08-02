@@ -60,19 +60,38 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
       }`}
       style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
     >
-      {/* Video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        onEnded={close}
-        className="max-w-[320px] w-[80vw] max-h-[60vh] rounded-2xl object-contain shadow-2xl"
-        src={src}
-      />
+      {/* Video with seamless edge blending */}
+      <div
+        className={`relative transition-all duration-300 ease-out ${
+          phase === "entering" ? "scale-90 opacity-0" : "scale-100 opacity-100"
+        }`}
+        style={{
+          WebkitMaskImage: "radial-gradient(ellipse 85% 85% at 50% 50%, black 60%, transparent 100%)",
+          maskImage: "radial-gradient(ellipse 85% 85% at 50% 50%, black 60%, transparent 100%)",
+        }}
+      >
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          onEnded={close}
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
+          preload="auto"
+          className="pointer-events-none w-[300px] max-w-[80vw] max-h-[55vh] object-contain"
+          style={{ mixBlendMode: "screen" }}
+          src={src}
+        />
+      </div>
 
       {/* Amount + label */}
-      <div className="mt-5 text-center">
+      <div
+        className={`mt-6 text-center transition-all duration-300 ease-out ${
+          phase === "entering" ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
+        }`}
+      >
         <p
           className={`text-4xl font-bold tracking-tight ${
             isSpending ? "text-red-400" : "text-emerald-400"
