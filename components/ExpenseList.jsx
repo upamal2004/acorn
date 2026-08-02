@@ -289,8 +289,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
 }
 
 function ExpenseGlyph({ expense }) {
-  const meta = categoryMeta[expense.category] || categoryMeta.OTHERS;
-  return <span>{meta.icon}</span>;
+  const meta = categoryMeta(expense.category);
+  return <span>{meta.emoji}</span>;
 }
 
 function TrashIcon() {
