@@ -20,9 +20,9 @@ export function WalletCard({ user, onToast }) {
 
   const handleAnimationComplete = useCallback(() => {
     setShowAnimation(false);
-    onToast?.("success", mode === "add" ? "Money added!" : "Balance updated!");
+    onToast?.("success", "Money added!");
     window.location.reload();
-  }, [onToast, mode]);
+  }, [onToast]);
 
   useEffect(() => {
     if (mode && inputRef.current) {
@@ -79,8 +79,9 @@ export function WalletCard({ user, onToast }) {
       if (!res.ok) throw new Error(data.error || "Could not save.");
       setMode(null);
       setInputValue("");
-      setSavedAmount(mode === "add" ? num : data.balance ?? num);
-      setShowAnimation(true);
+      setSavedAmount(num);
+      if (mode === "add") setShowAnimation(true);
+      else { onToast?.("success", "Balance updated!"); window.location.reload(); }
     } catch (err) {
       setError(err.message);
     } finally {

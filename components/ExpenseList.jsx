@@ -151,7 +151,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
         method: "POST",
       });
       if (!res.ok) throw new Error("Could not mark as paid - try again.");
-      onCelebrate?.("settled", mySplit?.amount, "Debt settled!");
+      onCelebrate?.("spent", mySplit?.amount, "Debt paid!");
       onChanged();
     } catch (err) {
       alert(err.message);
