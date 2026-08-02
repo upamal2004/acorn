@@ -24,7 +24,7 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
         </h2>
         <p className="mt-1 text-sm text-slate-500">
           {emptyNote ??
-            "Add an expense — rent, groceries, that takeaway — and it shows up here for you and whoever you split it with."}
+            "Add an expense - rent, groceries, that takeaway - and it shows up here for you and whoever you split it with."}
         </p>
       </section>
     );
@@ -159,7 +159,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
         <div className="flex flex-none flex-wrap items-center justify-end gap-2 text-right">
           <div>
             <p className="text-sm font-bold text-slate-800">
-              {mySplit ? formatMoney(mySplit.amount) : "—"}
+              {mySplit ? formatMoney(mySplit.amount) : "-"}
             </p>
 
             {mySplit ? (

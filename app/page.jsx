@@ -27,7 +27,7 @@ export default async function Home() {
         </h1>
 
         <p className="mt-5 max-w-xl text-lg text-slate-600">
-          Acorn keeps a single shared ledger for your household — or just yours.
+          Acorn keeps a single shared ledger for your household, or just yours.
           Track your spending solo, add an expense when you're ready, and when a
           room's involved everyone sees who owes what. No spreadsheets, no
           "you owe me" texts.

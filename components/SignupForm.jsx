@@ -37,7 +37,7 @@ export function SignupForm() {
         password,
         redirect: false,
       });
-      if (signInRes?.error) throw new Error("Account created — please sign in.");
+      if (signInRes?.error) throw new Error("Account created - please sign in.");
 
       router.push("/dashboard");
       router.refresh();

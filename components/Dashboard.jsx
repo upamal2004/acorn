@@ -9,6 +9,7 @@ import { DailySpendingBar } from "@/components/DailySpendingBar";
 import { RoomSummary } from "@/components/RoomSummary";
 import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
+import { RecentTransactions } from "@/components/RecentTransactions";
 import { ExpenseModal } from "@/components/ExpenseModal";
 import { computeSummary, isExpenseActiveForUser } from "@/lib/summary";
 
@@ -191,6 +192,12 @@ export function Dashboard({
                   : undefined
               }
             />
+            <RecentTransactions
+              expenses={expenses}
+              members={members}
+              currentUserId={user.id}
+              onToast={showToast}
+            />
           </div>
 
           <div className="min-w-0 space-y-6">
@@ -215,7 +222,7 @@ export function Dashboard({
                   Ready to split?
                 </h2>
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
-                  You're in personal mode — every expense is just yours. Create
+                  You're in personal mode: every expense is just yours. Create
                   a room or join a friend's with its code to split costs as a
                   group.
                 </p>

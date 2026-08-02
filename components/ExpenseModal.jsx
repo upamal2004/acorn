@@ -228,7 +228,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
               : isPersonal
                 ? "Add expense"
                 : selected.size > 1
-                  ? `Add expense — splits ${selected.size} ways`
+                  ? `Add expense - splits ${selected.size} ways`
                   : "Add expense"}
           </button>
         </form>

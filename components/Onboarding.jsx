@@ -59,7 +59,7 @@ export function Onboarding({ user }) {
             Hi{user?.name ? `, ${user.name.split(" ")[0]}` : ""}!
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Create a room, join a friend's with its code — or skip for now and
+            Create a room, join a friend's with its code, or skip for now and
             use Acorn solo.
           </p>
         </div>

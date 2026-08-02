@@ -55,7 +55,7 @@ export function InsightsPage({ user, room, members, expenses }) {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-900">Insights &amp; analytics</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Your personal share of every expense — how it breaks down, and how
+            Your personal share of every expense: how it breaks down, and how
             your spending compares with what you owe and are owed.
           </p>
         </div>

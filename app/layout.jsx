@@ -6,7 +6,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 export const metadata = {
   title: "Acorn · Split rent, bills & groceries with roommates",
   description:
-    "Acorn keeps a single shared room ledger for rent, bills and groceries — see who owes whom, and settle it in one tap.",
+    "Acorn keeps a single shared room ledger for rent, bills and groceries - see who owes whom, and settle it in one tap.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "48x48" },
