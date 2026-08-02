@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Avatar } from "@/components/Avatar";
+import { useState, useCallback } from "react";
 import { StoryAnimation } from "@/components/StoryAnimation";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { formatMoney } from "@/lib/money";
@@ -9,18 +8,35 @@ import { PENDING_VERIFICATION, PAID } from "@/lib/summary";
 import { categoryMeta } from "@/lib/categories";
 import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
 
-/** Chronological list of the expenses involving the signed-in user (the
- *  dashboard feed is filtered server-side to expenses they paid for or were
- *  split with). Each row shows the user's own share, a settle → verify
- *  workflow, and — for long titles or expenses with notes — a "View details"
- *  affordance that opens the full-expense modal. */
+/**
+ * Chronological list of the expenses involving the signed-in user.
+ * The delete confirmation modal is rendered at the root level to prevent overflow.
+ */
 export function ExpenseList({ expenses, members, currentUserId, onChanged, emptyNote }) {
   const [detailExpense, setDetailExpense] = useState(null);
-  const [animation, setAnimation] = useState(null); // { type, amount, category, label }
+  const [animation, setAnimation] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // { id, title } or null
+  const [deleting, setDeleting] = useState(false);
 
   const handleAnimationComplete = useCallback(() => {
     setAnimation(null);
   }, []);
+
+  async function handleDeleteConfirm() {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/expenses/${deleteConfirm.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not delete.");
+      setDeleteConfirm(null);
+      onChanged();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   if (!expenses.length) {
     return (
@@ -38,7 +54,7 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
   }
 
   return (
-    <section className="card">
+    <>
       {/* Story-driven receiving/settled animation */}
       <StoryAnimation
         type={animation?.type || "received"}
@@ -48,54 +64,69 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
         onComplete={handleAnimationComplete}
       />
 
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">
-        Expenses
-      </h2>
-      <ul className="divide-y divide-slate-100">
-        {expenses.map((exp) => (
-          <ExpenseRow
-            key={exp.id}
-            expense={exp}
+      {/* Delete confirmation modal - rendered at root level */}
+      <ConfirmModal
+        show={!!deleteConfirm}
+        title="Delete expense?"
+        message={`Are you sure you want to delete "${deleteConfirm?.title}"? This action cannot be undone and the expense will be permanently removed.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        busy={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteConfirm(null)}
+      />
+
+      <section className="card">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">
+          Expenses
+        </h2>
+        <ul className="divide-y divide-slate-100">
+          {expenses.map((exp) => (
+            <ExpenseRow
+              key={exp.id}
+              expense={exp}
+              members={members}
+              currentUserId={currentUserId}
+              onChanged={onChanged}
+              onView={() => setDetailExpense(exp)}
+              onCelebrate={(type, amount, label) => setAnimation({ type, amount, label })}
+              onDeleteRequest={(id, title) => setDeleteConfirm({ id, title })}
+            />
+          ))}
+        </ul>
+
+        {detailExpense && (
+          <ExpenseDetailModal
+            expense={detailExpense}
             members={members}
             currentUserId={currentUserId}
-            onChanged={onChanged}
-            onView={() => setDetailExpense(exp)}
-            onCelebrate={(type, amount, label) => setAnimation({ type, amount, label })}
+            onClose={() => setDetailExpense(null)}
           />
-        ))}
-      </ul>
-
-      {detailExpense && (
-        <ExpenseDetailModal
-          expense={detailExpense}
-          members={members}
-          currentUserId={currentUserId}
-          onClose={() => setDetailExpense(null)}
-        />
-      )}
-    </section>
+        )}
+      </section>
+    </>
   );
 }
 
-function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCelebrate }) {
+/**
+ * Individual expense row. No modals rendered here — confirmation is handled by parent.
+ */
+function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCelebrate, onDeleteRequest }) {
   const [busy, setBusy] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
   const mySplit = expense.splits[currentUserId];
-  const isOwner = expense.paidBy === currentUserId; // the payer verifies settlements
-  const canDelete = expense.createdBy === currentUserId;
+  const isOwner = expense.paidBy === currentUserId;
   const splitCount = Object.keys(expense.splits || {}).length;
 
   // Personal expense: no room and only 1 split (the current user)
   const isPersonal = !expense.roomId && splitCount === 1 && expense.splits[currentUserId];
   // Can delete only if creator AND it's a personal expense
-  const canDeletePersonal = canDelete && isPersonal;
+  const canDeletePersonal = expense.createdBy === currentUserId && isPersonal;
 
-  // Long titles and expenses with notes get a "View details" affordance so the
-  // full text never needs to squeeze into the row — it opens a clean modal.
+  // Long titles and expenses with notes get a "View details" affordance
   const isLong = (expense.title || "").length > 48;
   const hasNotes = Boolean(expense.description);
   const canViewDetails = isLong || hasNotes;
@@ -142,22 +173,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
     }
   }
 
-  async function remove() {
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/expenses/${expense.id}`, { method: "DELETE" });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Could not delete.");
-      setShowDeleteConfirm(false);
-      onChanged();
-    } catch (err) {
-      alert(err.message);
-      setDeleting(false);
-    }
-  }
-
   return (
-    <li className="expense-row relative py-3.5">
+    <li className="expense-row py-3.5">
       <div className="flex items-center gap-4">
         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-slate-50 text-lg">
           <ExpenseGlyph expense={expense} />
@@ -221,33 +238,15 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
 
           {canDeletePersonal && (
             <button
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={deleting}
+              onClick={() => onDeleteRequest?.(expense.id, expense.title)}
               title="Delete personal expense"
               className="btn-ghost px-2 py-1.5 text-slate-400 transition hover:text-red-500"
             >
-              {deleting ? (
-                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-red-500" />
-              ) : (
-                <TrashIcon />
-              )}
+              <TrashIcon />
             </button>
           )}
         </div>
       </div>
-
-      {/* Delete confirmation modal */}
-      <ConfirmModal
-        show={showDeleteConfirm}
-        title="Delete expense?"
-        message={`Are you sure you want to delete "${expense.title}"? This action cannot be undone and the expense will be permanently removed.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="danger"
-        busy={deleting}
-        onConfirm={remove}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
 
       {pendingVerifications.length > 0 && (
         <div className="mt-3 space-y-2 rounded-xl bg-amber-50/80 px-3 py-2.5">
@@ -264,32 +263,22 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
                   marked <span className="font-semibold">{formatMoney(share.amount)}</span>{" "}
                   as paid
                 </span>
-                <span className="flex items-center gap-1.5">
+                <div className="flex gap-2">
                   <button
+                    disabled={busyVerify}
                     onClick={() => verify(m.id, "approve")}
-                    disabled={busyVerify}
-                    title="Approve payment"
-                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-60"
+                    className="rounded-lg bg-emerald-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-600 active:scale-95"
                   >
-                    {busyVerify ? "…" : (
-                      <>
-                        <CheckIcon /> Approve
-                      </>
-                    )}
+                    {busyVerify ? "…" : "Approve"}
                   </button>
                   <button
-                    onClick={() => verify(m.id, "reject")}
                     disabled={busyVerify}
-                    title="Reject payment"
-                    className="inline-flex items-center gap-1 rounded-lg bg-red-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
+                    onClick={() => verify(m.id, "reject")}
+                    className="rounded-lg bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-300 active:scale-95"
                   >
-                    {busyVerify ? "…" : (
-                      <>
-                        <XIcon /> Reject
-                      </>
-                    )}
+                    Reject
                   </button>
-                </span>
+                </div>
               </div>
             );
           })}
@@ -299,73 +288,17 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
   );
 }
 
+function ExpenseGlyph({ expense }) {
+  const meta = categoryMeta[expense.category] || categoryMeta.OTHERS;
+  return <span>{meta.icon}</span>;
+}
+
 function TrashIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
     </svg>
   );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 12.5l5.5 5.5L20 6.5"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ExpenseGlyph({ expense }) {
-  const cat = categoryMeta(expense.category);
-  // A real category wins; "Others" (or legacy rows) fall back to guessing an
-  // emoji from the title so the box still feels personal.
-  if (expense.category && expense.category !== "OTHERS") {
-    return <span style={{ color: cat.color }}>{cat.emoji}</span>;
-  }
-  const t = (expense.title || "").toLowerCase();
-  const map = {
-    rent: "🏠",
-    utility: "💡",
-    electricity: "💡",
-    gas: "🔥",
-    water: "💧",
-    internet: "🌐",
-    wifi: "🌐",
-    grocery: "🛒",
-    groceries: "🛒",
-    food: "🍔",
-    takeaway: "🥡",
-    meal: "🍜",
-    dinner: "🍝",
-    cleaning: "🧼",
-    netflix: "📺",
-  };
-  const hit = Object.keys(map).find((k) => t.includes(k));
-  return <span className="text-slate-400">{hit ? map[hit] : "🧾"}</span>;
 }
