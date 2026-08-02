@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getUser, getRoom, getMembers, getExpenses, getPersonalExpenses } from "@/lib/queries";
+import { getUser, getMembers, getExpenses, getPersonalExpenses } from "@/lib/queries";
 import { InsightsPage } from "@/components/InsightsPage";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +17,10 @@ export default async function InsightsRoute() {
     return <InsightsPage user={user} room={null} members={[user]} expenses={personalExpenses} />;
   }
 
-  const [room, members, expenses] = await Promise.all([
-    getRoom(user.roomId),
+  const [members, expenses] = await Promise.all([
     getMembers(user.roomId),
     getExpenses(user.roomId, user.id),
   ]);
 
-  return <InsightsPage user={user} room={room} members={members} expenses={expenses} />;
+  return <InsightsPage user={user} room={user.room} members={members} expenses={expenses} />;
 }

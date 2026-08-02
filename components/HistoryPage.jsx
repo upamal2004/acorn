@@ -16,11 +16,12 @@ const HISTORY_DAYS = 30;
 /** Dedicated /history page — the logged-in user's own transactions from the
  *  last 30 days, grouped by day and shown as personal shares. Fully settled
  *  expenses end up here after they drop off the dashboard's active list. */
-export function HistoryPage({ user, room, members, expenses }) {
+export function HistoryPage({ user, room, members, expenses: initialExpenses }) {
   const [detailExpense, setDetailExpense] = useState(null);
   const [toast, setToast] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [expenses, setExpenses] = useState(initialExpenses);
 
   const cutoff = useMemo(() => new Date(Date.now() - HISTORY_DAYS * 86400000), []);
 
@@ -44,6 +45,7 @@ export function HistoryPage({ user, room, members, expenses }) {
       const res = await fetch(`/api/expenses/${deleteConfirm.id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not delete.");
+      setExpenses((prev) => prev.filter((e) => e.id !== deleteConfirm.id));
       setDeleteConfirm(null);
       setToast({ type: "success", message: "Expense deleted." });
     } catch (err) {

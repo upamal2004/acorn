@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getUser, getRoom, getMembers, getExpenses, getPersonalExpenses } from "@/lib/queries";
+import { getUser, getMembers, getExpenses, getPersonalExpenses } from "@/lib/queries";
 import { Dashboard } from "@/components/Dashboard";
 
 export const dynamic = "force-dynamic";
@@ -12,18 +12,15 @@ export default async function DashboardPage() {
   const user = await getUser(session.user.id);
   if (!user) redirect("/login");
 
-  // Personal mode: no room yet — show the user's own wallet + expenses and
-  // invite them to create/join a room for splitting.
   if (!user.roomId) {
     const personalExpenses = await getPersonalExpenses(user.id);
     return <Dashboard user={user} room={null} members={[user]} expenses={personalExpenses} />;
   }
 
-  const [room, members, expenses] = await Promise.all([
-    getRoom(user.roomId),
+  const [members, expenses] = await Promise.all([
     getMembers(user.roomId),
     getExpenses(user.roomId, user.id),
   ]);
 
-  return <Dashboard user={user} room={room} members={members} expenses={expenses} />;
+  return <Dashboard user={user} room={user.room} members={members} expenses={expenses} />;
 }
