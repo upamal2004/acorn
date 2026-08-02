@@ -1,18 +1,12 @@
 "use client";
 
+import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
+
 /**
  * Reusable confirmation modal with warning styling.
- * Shows a message with Confirm/Cancel buttons.
- *
- * @param {boolean} show - Whether to show the modal
- * @param {string} title - Modal title
- * @param {string} message - Confirmation message
- * @param {string} [confirmText] - Confirm button text (default: "Confirm")
- * @param {string} [cancelText] - Cancel button text (default: "Cancel")
- * @param {"danger" | "warning" | "info"} [variant] - Visual variant
- * @param {boolean} [busy] - Loading state
- * @param {() => void} onConfirm - Called when confirmed
- * @param {() => void} onCancel - Called when cancelled
+ * Uses createPortal to render into document.body, avoiding any
+ * parent overflow:hidden or z-index clipping issues.
  */
 export function ConfirmModal({
   show,
@@ -25,7 +19,13 @@ export function ConfirmModal({
   onConfirm,
   onCancel,
 }) {
-  if (!show) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!show || !mounted) return null;
 
   const variantStyles = {
     danger: {
@@ -50,9 +50,9 @@ export function ConfirmModal({
 
   const styles = variantStyles[variant];
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={onCancel}
     >
       <div
@@ -99,6 +99,7 @@ export function ConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
