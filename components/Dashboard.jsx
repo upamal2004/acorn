@@ -192,12 +192,6 @@ export function Dashboard({
                   : undefined
               }
             />
-            <RecentTransactions
-              expenses={expenses}
-              members={members}
-              currentUserId={user.id}
-              onToast={showToast}
-            />
           </div>
 
           <div className="min-w-0 space-y-6">
@@ -238,6 +232,13 @@ export function Dashboard({
             )}
           </div>
         </div>
+
+        <RecentTransactions
+          expenses={expenses}
+          members={members}
+          currentUserId={user.id}
+          onToast={showToast}
+        />
       </main>
 
       {modalOpen && (
