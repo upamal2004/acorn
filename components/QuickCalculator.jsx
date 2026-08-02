@@ -120,28 +120,27 @@ export function QuickCalculator({ show, onClose, onUseResult }) {
 
   const buttons = [
     { label: "C", action: clear, type: "clear" },
-    { label: "±", action: () => setDisplay(String(-parseFloat(display))), type: "function" },
     { label: "%", action: () => setDisplay(String(parseFloat(display) / 100)), type: "function" },
     { label: "÷", action: () => performOperation("/"), type: "operator", active: operation === "/" },
+    { label: "×", action: () => performOperation("*"), type: "operator", active: operation === "*" },
 
     { label: "7", action: () => inputDigit(7), type: "number" },
     { label: "8", action: () => inputDigit(8), type: "number" },
     { label: "9", action: () => inputDigit(9), type: "number" },
-    { label: "×", action: () => performOperation("*"), type: "operator", active: operation === "*" },
+    { label: "−", action: () => performOperation("-"), type: "operator", active: operation === "-" },
 
     { label: "4", action: () => inputDigit(4), type: "number" },
     { label: "5", action: () => inputDigit(5), type: "number" },
     { label: "6", action: () => inputDigit(6), type: "number" },
-    { label: "−", action: () => performOperation("-"), type: "operator", active: operation === "-" },
+    { label: "+", action: () => performOperation("+"), type: "operator", active: operation === "+" },
 
     { label: "1", action: () => inputDigit(1), type: "number" },
     { label: "2", action: () => inputDigit(2), type: "number" },
     { label: "3", action: () => inputDigit(3), type: "number" },
-    { label: "+", action: () => performOperation("+"), type: "operator", active: operation === "+" },
+    { label: "=", action: calculate, type: "equals" },
 
     { label: "0", action: () => inputDigit(0), type: "number", wide: true },
     { label: ".", action: inputDecimal, type: "number" },
-    { label: "=", action: calculate, type: "equals" },
   ];
 
   return (
