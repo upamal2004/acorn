@@ -165,9 +165,7 @@ export function AboutPage({ user }) {
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-slate-400">
-          Acorn v1.0 · Built with 💛 for roommates everywhere
-        </p>
+        
       </main>
     </div>
   );
