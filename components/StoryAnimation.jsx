@@ -28,11 +28,11 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
     setPhase("entering");
 
     const visibleTimer = setTimeout(() => setPhase("visible"), 100);
-    const fadeTimer = setTimeout(() => setPhase("fading"), 2200);
+    const fadeTimer = setTimeout(() => setPhase("fading"), 1400);
     const completeTimer = setTimeout(() => {
       setPhase("hidden");
       onComplete?.();
-    }, 2700);
+    }, 1700);
 
     return () => {
       clearTimeout(visibleTimer);
@@ -47,10 +47,10 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
   const isWallet = type === "wallet";
   const isSpending = type === "spent";
 
-  // Distinct backdrop colors for emotional clarity
+  // Spending gets warm dark overlay, receiving/wallet gets emerald
   const backdropClass = isSpending
-    ? "bg-red-950/40"
-    : "bg-emerald-950/40";
+    ? "bg-black/60"
+    : "bg-black/60";
 
   return (
     <div
@@ -111,7 +111,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
         {/* Progress bar */}
         <div className="w-48 h-1 overflow-hidden rounded-full bg-white/20">
           <div
-            className={`h-full rounded-full transition-all duration-[2200ms] ease-linear ${
+            className={`h-full rounded-full transition-all duration-[1200ms] ease-linear ${
               isSpending ? "bg-red-400" : "bg-emerald-400"
             }`}
             style={{ width: phase === "fading" || phase === "visible" ? "100%" : "0%" }}
