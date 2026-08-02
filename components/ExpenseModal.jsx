@@ -22,6 +22,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [fading, setFading] = useState(false);
 
   // Compute today's spending per category for limit warnings
   const todaySpending = useMemo(() => {
@@ -80,7 +81,9 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not add expense.");
       setSuccess(true);
-      setTimeout(() => onSaved(), 600);
+      // Show animation for 2.5s, then fade out
+      setTimeout(() => setFading(true), 2000);
+      setTimeout(() => onSaved(), 2500);
     } catch (err) {
       setError(err.message);
       setBusy(false);
@@ -92,8 +95,12 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Success overlay with spending emotion */}
         {success && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/95 sm:rounded-2xl">
-            <MoneyEmotion type="spent" amount={parseFloat(amount) || 0} fire={true} />
+          <div className={`absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl backdrop-blur-md transition-opacity duration-500 sm:rounded-2xl ${
+            fading ? "bg-white/60 opacity-0" : "bg-white/90 opacity-100"
+          }`}>
+            <div className={fading ? "scale-95 opacity-0 transition-all duration-500" : "scale-100 opacity-100 transition-all duration-300"}>
+              <MoneyEmotion type="spent" amount={parseFloat(amount) || 0} fire={true} />
+            </div>
           </div>
         )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar } from "@/components/Avatar";
 import { MoneyEmotion } from "@/components/MoneyEmotion";
 import { formatMoney } from "@/lib/money";
@@ -68,7 +68,17 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
   const [deleting, setDeleting] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
   const [celebration, setCelebration] = useState(null);
+  const [celebrationFading, setCelebrationFading] = useState(false);
   const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
+
+  // Auto-dismiss celebration overlay after 2.5s with fade-out
+  useEffect(() => {
+    if (!celebration) return;
+    setCelebrationFading(false);
+    const fadeTimer = setTimeout(() => setCelebrationFading(true), 2000);
+    const hideTimer = setTimeout(() => { setCelebration(null); setCelebrationFading(false); }, 2500);
+    return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
+  }, [celebration]);
 
   const mySplit = expense.splits[currentUserId];
   const isOwner = expense.paidBy === currentUserId; // the payer verifies settlements
@@ -143,7 +153,9 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
     <li className="expense-row relative py-3.5">
       {/* Celebration overlay for settled/approved */}
       {celebration && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/90 receive-emotion">
+        <div className={`absolute inset-0 z-10 flex items-center justify-center rounded-xl backdrop-blur-md transition-all duration-500 ${
+          celebrationFading ? "bg-white/40 opacity-0 scale-95" : "bg-white/90 opacity-100 scale-100"
+        }`}>
           <MoneyEmotion
             type={celebration.type === "settled" ? "settled" : "received"}
             amount={celebration.amount}
