@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 const VIDEO_MAP = {
   spent: "/spent.mp4.mp4?v=2",
@@ -15,6 +16,12 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
   const videoRef = useRef(null);
   const fallbackRef = useRef(null);
   const [phase, setPhase] = useState("hidden");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const close = useCallback(() => {
     setPhase("fading");
@@ -48,12 +55,12 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
     }
   }, [phase]);
 
-  if (phase === "hidden") return null;
+  if (!mounted || phase === "hidden") return null;
 
   const src = VIDEO_MAP[type] || VIDEO_MAP.spent;
   const isSpending = type === "spent";
 
-  return (
+  return createPortal(
     <div
       className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-300 ${
         phase === "fading" ? "opacity-0" : "opacity-100"
@@ -66,7 +73,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
           phase === "entering" ? "scale-90 opacity-0" : "scale-100 opacity-100"
         }`}
       >
-        {/* Video with brightness filter to wash out checkerboard */}
+        {/* Video */}
         <video
           ref={videoRef}
           autoPlay
@@ -105,6 +112,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
             ""}
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
