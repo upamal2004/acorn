@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
-import { SettingsModal } from "@/components/SettingsModal";
 
 const NAV_LINKS = [
   { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
@@ -17,8 +15,6 @@ const NAV_LINKS = [
  *  Insights), room code, avatar, account settings and sign out. Rendered on
  *  every authenticated page so the main nav is always one tap away. */
 export function DashboardHeader({ user, room, active, onToast }) {
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
   async function handleSignOut() {
     try {
       await signOut({ callbackUrl: "/login" });
@@ -41,13 +37,13 @@ export function DashboardHeader({ user, room, active, onToast }) {
               </span>
             )}
             <Avatar name={user.name} image={user.image} size={32} />
-            <button
-              onClick={() => setSettingsOpen(true)}
+            <Link
+              href="/settings"
               className="btn-ghost px-2.5 py-2"
               title="Account settings"
             >
               <GearIcon />
-            </button>
+            </Link>
             <button
               onClick={handleSignOut}
               className="btn-ghost px-3 py-1.5 text-xs"
@@ -79,14 +75,6 @@ export function DashboardHeader({ user, room, active, onToast }) {
           })}
         </nav>
       </div>
-
-      {settingsOpen && (
-        <SettingsModal
-          user={user}
-          onClose={() => setSettingsOpen(false)}
-          onToast={(type, message) => onToast?.(type, message)}
-        />
-      )}
     </header>
   );
 }
