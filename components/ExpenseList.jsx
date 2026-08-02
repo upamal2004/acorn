@@ -67,6 +67,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
+  const [celebration, setCelebration] = useState(null);
   const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
   const mySplit = expense.splits[currentUserId];
