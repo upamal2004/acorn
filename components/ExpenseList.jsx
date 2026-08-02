@@ -15,7 +15,7 @@ import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
 export function ExpenseList({ expenses, members, currentUserId, onChanged, emptyNote }) {
   const [detailExpense, setDetailExpense] = useState(null);
   const [animation, setAnimation] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // { id, title } or null
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // { id, title, isShared } or null
   const [deleting, setDeleting] = useState(false);
 
   const handleAnimationComplete = useCallback(() => {
@@ -68,7 +68,11 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
       <ConfirmModal
         show={!!deleteConfirm}
         title="Delete expense?"
-        message={`Are you sure you want to delete "${deleteConfirm?.title}"? This action cannot be undone and the expense will be permanently removed.`}
+        message={
+          deleteConfirm?.isShared
+            ? `Are you sure you want to delete "${deleteConfirm?.title}"? This is a shared expense. Deleting it will adjust room balances and remove it from all members' records. This action cannot be undone.`
+            : `Are you sure you want to delete "${deleteConfirm?.title}"? This action cannot be undone and the expense will be permanently removed.`
+        }
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
@@ -91,7 +95,7 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
               onChanged={onChanged}
               onView={() => setDetailExpense(exp)}
               onCelebrate={(type, amount, label) => setAnimation({ type, amount, label })}
-              onDeleteRequest={(id, title) => setDeleteConfirm({ id, title })}
+              onDeleteRequest={(id, title, isShared) => setDeleteConfirm({ id, title, isShared })}
             />
           ))}
         </ul>
@@ -121,10 +125,10 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
   const isOwner = expense.paidBy === currentUserId;
   const splitCount = Object.keys(expense.splits || {}).length;
 
-  // Personal expense: no room and only 1 split (the current user)
-  const isPersonal = !expense.roomId && splitCount === 1 && expense.splits[currentUserId];
-  // Can delete only if creator AND it's a personal expense
-  const canDeletePersonal = expense.createdBy === currentUserId && isPersonal;
+  // Can delete if the current user is the creator (personal OR shared)
+  const isCreator = expense.createdBy === currentUserId;
+  const isShared = splitCount > 1;
+  const canDelete = isCreator;
 
   // Long titles and expenses with notes get a "View details" affordance
   const isLong = (expense.title || "").length > 48;
@@ -236,10 +240,10 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
             )}
           </div>
 
-          {canDeletePersonal && (
+          {canDelete && (
             <button
-              onClick={() => onDeleteRequest?.(expense.id, expense.title)}
-              title="Delete personal expense"
+              onClick={() => onDeleteRequest?.(expense.id, expense.title, isShared)}
+              title="Delete expense"
               className="btn-ghost px-2 py-1.5 text-slate-400 transition hover:text-red-500"
             >
               <TrashIcon />

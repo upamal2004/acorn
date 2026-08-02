@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { groupExpensesByDay, personalAmount } from "@/lib/history";
 import { categoryMeta } from "@/lib/categories";
 import { PENDING_VERIFICATION } from "@/lib/summary";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 const HISTORY_DAYS = 30;
 
@@ -18,6 +19,8 @@ const HISTORY_DAYS = 30;
 export function HistoryPage({ user, room, members, expenses }) {
   const [detailExpense, setDetailExpense] = useState(null);
   const [toast, setToast] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const cutoff = useMemo(() => new Date(Date.now() - HISTORY_DAYS * 86400000), []);
 
@@ -33,6 +36,22 @@ export function HistoryPage({ user, room, members, expenses }) {
 
   const days = useMemo(() => groupExpensesByDay(recent), [recent]);
   const total = useMemo(() => recent.reduce((s, e) => s + e.amount, 0), [recent]);
+
+  async function handleDeleteConfirm() {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/expenses/${deleteConfirm.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not delete.");
+      setDeleteConfirm(null);
+      setToast({ type: "success", message: "Expense deleted." });
+    } catch (err) {
+      setToast({ type: "error", message: err.message });
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -128,6 +147,22 @@ export function HistoryPage({ user, room, members, expenses }) {
                         >
                           View
                         </button>
+                        {exp.createdBy === user.id && (
+                          <button
+                            onClick={() => {
+                              const splitCount = Object.keys(exp.splits || {}).length;
+                              setDeleteConfirm({ id: exp.id, title: exp.title, isShared: splitCount > 1 });
+                            }}
+                            className="btn-ghost flex-none px-2 py-1.5 text-slate-400 transition hover:text-red-500"
+                            title="Delete expense"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <line x1="10" y1="11" x2="10" y2="17" />
+                              <line x1="14" y1="11" x2="14" y2="17" />
+                            </svg>
+                          </button>
+                        )}
                       </li>
                     );
                   })}
@@ -146,6 +181,22 @@ export function HistoryPage({ user, room, members, expenses }) {
           onClose={() => setDetailExpense(null)}
         />
       )}
+
+      <ConfirmModal
+        show={!!deleteConfirm}
+        title="Delete expense?"
+        message={
+          deleteConfirm?.isShared
+            ? `Are you sure you want to delete "${deleteConfirm?.title}"? This is a shared expense. Deleting it will adjust room balances and remove it from all members' records. This action cannot be undone.`
+            : `Are you sure you want to delete "${deleteConfirm?.title}"? This action cannot be undone and the expense will be permanently removed.`
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        busy={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteConfirm(null)}
+      />
 
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4">
