@@ -2,20 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
-import { ScratChasingAcorn } from "@/components/ScratChasingAcorn";
 
 /**
- * Animated splash screen with Scrat chasing an acorn.
- * Shows Scrat running in, the acorn bouncing, then fades out.
+ * Clean splash screen — logo + brand lockup with a minimal pulse.
+ * No character graphics.
  */
 export function SplashScreen() {
   const [visible, setVisible] = useState(true);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    // Start fade-out after1.8s, then fully unmount after the transition ends.
-    const fadeTimer = setTimeout(() => setFading(true), 1800);
-    const hideTimer = setTimeout(() => setVisible(false), 2300);
+    const fadeTimer = setTimeout(() => setFading(true), 1600);
+    const hideTimer = setTimeout(() => setVisible(false), 2100);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(hideTimer);
@@ -32,34 +30,30 @@ export function SplashScreen() {
       aria-label="Loading"
     >
       <div
-        className={`flex flex-col items-center gap-2 transition-all duration-700 ease-out ${
+        className={`flex flex-col items-center gap-3 transition-all duration-700 ease-out ${
           fading ? "scale-105 opacity-0" : "scale-100 opacity-100"
         }`}
-        style={{ animationDelay: "0.1s" }}
       >
-        {/* Scrat chasing acorn animation */}
-        <div className="splash-logo">
-          <ScratChasingAcorn size={140} />
+        {/* Logo mark */}
+        <div className="animate-[check-pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)]">
+          <Logo size={48} />
         </div>
 
-        {/* App name and tagline */}
-        <div className="splash-text flex flex-col items-center gap-1" style={{ animation: "splash-text 0.8s ease-out 0.4s both" }}>
-          <div className="flex items-center gap-2">
-            <Logo size={32} />
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Acorn
-            </h1>
-          </div>
-          <p className="text-sm text-slate-400">
-            Split expenses, minus the awkwardness.
-          </p>
-        </div>
+        {/* App name */}
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          Acorn
+        </h1>
 
-        {/* Decorative acorns */}
-        <div className="mt-4 flex gap-3 opacity-40" style={{ animation: "splash-text 0.6s ease-out 0.8s both" }}>
-          <span className="text-lg" style={{ animation: "acorn-bounce 2s ease-in-out infinite 0s" }}>🌰</span>
-          <span className="text-sm" style={{ animation: "acorn-bounce 2s ease-in-out infinite 0.3s" }}>🌰</span>
-          <span className="text-lg" style={{ animation: "acorn-bounce 2s ease-in-out infinite 0.6s" }}>🌰</span>
+        {/* Tagline */}
+        <p className="text-sm text-slate-400">
+          Split expenses, minus the awkwardness.
+        </p>
+
+        {/* Minimal pulsing dots */}
+        <div className="mt-4 flex gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-[dot-pulse_1.2s_ease-in-out_infinite]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-[dot-pulse_1.2s_ease-in-out_infinite_0.2s]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-[dot-pulse_1.2s_ease-in-out_infinite_0.4s]" />
         </div>
       </div>
     </div>
