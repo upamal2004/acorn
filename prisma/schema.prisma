@@ -18,7 +18,7 @@ model User {
   id           String   @id @default(cuid())
   name         String
   email        String   @unique
-  passwordHash String
+  passwordHash String?  // nullable for OAuth users (Google sign-in)
   image        String?
   emailVerified DateTime?
 

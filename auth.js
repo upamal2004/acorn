@@ -1,14 +1,15 @@
 // ---------------------------------------------------------------------------
-// auth.js — Auth.js (NextAuth v5) configuration for email/password auth.
+// auth.js — Auth.js (NextAuth v5) configuration for email/password + Google
+// OAuth authentication.
 //
-// Users are created via /api/register (bcrypt-hashed passwords stored on the
-// User row). Sign-in uses the Credentials provider, which verifies the
-// password and returns a JWT session cookie — no external providers, no
-// adapter, no database round-trip when reading sessions.
+// Users are created via /api/register (bcrypt-hashed passwords) or
+// automatically on first Google sign-in. JWT sessions avoid database
+// round-trips when reading sessions.
 // ---------------------------------------------------------------------------
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { findUserByEmail } from "@/lib/queries";
+import Google from "next-auth/providers/google";
+import { findUserByEmail, findOrCreateGoogleUser } from "@/lib/queries";
 import { verifyPassword } from "@/lib/password";
 import { fromCents } from "@/lib/money";
 
@@ -22,6 +23,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -33,7 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         const user = await findUserByEmail(email);
-        if (!user) return null;
+        if (!user || !user.passwordHash) return null;
 
         const valid = await verifyPassword(password, user.passwordHash);
         if (!valid) return null;
@@ -53,12 +59,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     // On sign-in, copy the account fields into the token so the session
     // callback can surface them without hitting the database.
-    jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.balance = user.balance ?? 0;
         token.roomId = user.roomId ?? null;
       }
+
+      // First-time Google sign-in: find or create the user in our database
+      if (account?.provider === "google" && token.email) {
+        try {
+          const dbUser = await findOrCreateGoogleUser({
+            email: token.email,
+            name: token.name ?? "Google User",
+            image: token.picture ?? null,
+          });
+          token.id = dbUser.id;
+          token.balance = fromCents(dbUser.balance);
+          token.roomId = dbUser.roomId ?? null;
+        } catch {
+          // If user creation fails, the token still has the basic info
+        }
+      }
+
       return token;
     },
 

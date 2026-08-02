@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "./PasswordInput";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 /** Email/password sign-up: creates the account, then signs in automatically
  *  and sends the user to their (personal-mode) dashboard. */
@@ -47,60 +48,73 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-          Name
-        </label>
-        <input
-          className="input"
-          autoComplete="name"
-          placeholder="Alex Acorn"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          autoFocus
-        />
+    <div className="space-y-4">
+      <GoogleSignInButton label="Sign up with Google" />
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-3 text-slate-400">or continue with email</span>
+        </div>
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-          Email
-        </label>
-        <input
-          className="input"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">
+            Name
+          </label>
+          <input
+            className="input"
+            autoComplete="name"
+            placeholder="Alex Acorn"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoFocus
+          />
+        </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-          Password
-        </label>
-        <PasswordInput
-          autoComplete="new-password"
-          placeholder="At least 8 characters"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-        />
-      </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">
+            Email
+          </label>
+          <input
+            className="input"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
-      {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">
+            Password
+          </label>
+          <PasswordInput
+            autoComplete="new-password"
+            placeholder="At least 8 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+          />
+        </div>
 
-      <button type="submit" disabled={busy} className="btn-primary w-full py-3">
-        {busy ? "Creating account…" : "Create account"}
-      </button>
-    </form>
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </p>
+        )}
+
+        <button type="submit" disabled={busy} className="btn-primary w-full py-3">
+          {busy ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+    </div>
   );
 }
