@@ -1,20 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
+import { QuickCalculator } from "@/components/QuickCalculator";
 
 const NAV_LINKS = [
   { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
   { key: "history", href: "/history", label: "History", icon: <CalendarIcon /> },
   { key: "insights", href: "/insights", label: "Insights", icon: <ChartIcon /> },
+  { key: "about", href: "/about", label: "About", icon: <InfoIcon /> },
 ];
 
 /** Shared signed-in top bar: logo, primary navigation (Dashboard / History /
  *  Insights), room code, avatar, account settings and sign out. Rendered on
  *  every authenticated page so the main nav is always one tap away. */
 export function DashboardHeader({ user, room, active, onToast }) {
+  const [showCalculator, setShowCalculator] = useState(false);
+
   async function handleSignOut() {
     try {
       await signOut({ callbackUrl: "/login" });
@@ -23,41 +28,65 @@ export function DashboardHeader({ user, room, active, onToast }) {
     }
   }
 
-  return (
-    <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur">
-      <div className="mx-auto w-full max-w-5xl px-6">
-        <div className="flex items-center justify-between py-3.5">
-          <Link href="/dashboard" aria-label="Acorn dashboard">
-            <Logo size={26} />
-          </Link>
-          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-            {room && (
-              <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
-                {room.code}
-              </span>
-            )}
-            <Avatar name={user.name} image={user.image} size={32} />
-            <Link
-              href="/settings"
-              className="btn-ghost px-2.5 py-2"
-              title="Account settings"
-            >
-              <GearIcon />
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="btn-ghost px-3 py-1.5 text-xs"
-              title="Sign out"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
+  function handleUseResult(value) {
+    // Copy to clipboard for easy pasting
+    navigator.clipboard.writeText(value).then(() => {
+      onToast?.("success", `Copied Rs. ${value} to clipboard`);
+    }).catch(() => {
+      onToast?.("info", `Result: Rs. ${value}`);
+    });
+  }
 
-        <nav className="-mx-2 mb-3 flex gap-1 overflow-x-auto pb-0.5" aria-label="Primary">
-          {NAV_LINKS.map((link) => {
-            const isActive = link.key === active;
-            return (
+  return (
+    <>
+      <QuickCalculator
+        show={showCalculator}
+        onClose={() => setShowCalculator(false)}
+        onUseResult={handleUseResult}
+      />
+
+      <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur">
+        <div className="mx-auto w-full max-w-5xl px-6">
+          <div className="flex items-center justify-between py-3.5">
+            <Link href="/dashboard" aria-label="Acorn dashboard">
+              <Logo size={26} />
+            </Link>
+            <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+              {room && (
+                <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
+                  {room.code}
+                </span>
+              )}
+              {/* Calculator button */}
+              <button
+                onClick={() => setShowCalculator(true)}
+                className="btn-ghost px-2.5 py-2"
+                title="Quick Calculator"
+              >
+                <CalcIcon />
+              </button>
+              <Avatar name={user.name} image={user.image} size={32} />
+              <Link
+                href="/settings"
+                className="btn-ghost px-2.5 py-2"
+                title="Account settings"
+              >
+                <GearIcon />
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="btn-ghost px-3 py-1.5 text-xs"
+                title="Sign out"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+
+          <nav className="-mx-2 mb-3 flex gap-1 overflow-x-auto pb-0.5" aria-label="Primary">
+            {NAV_LINKS.map((link) => {
+              const isActive = link.key === active;
+              return (
               <Link
                 key={link.key}
                 href={link.href}
@@ -76,6 +105,7 @@ export function DashboardHeader({ user, room, active, onToast }) {
         </nav>
       </div>
     </header>
+    </>
   );
 }
 
@@ -136,6 +166,25 @@ function GearIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function CalcIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 6h8M8 10h8M8 14h3M15 14l2 2M15 16l2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="8" y="17" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.3" />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

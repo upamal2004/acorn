@@ -5,11 +5,10 @@ import { formatMoney } from "@/lib/money";
 import { StoryAnimation } from "@/components/StoryAnimation";
 
 /**
- * Personal wallet balance card with inline editing.
- * Shows current balance with a clean edit/save flow.
+ * Personal wallet balance card with Add Money and Edit Balance options.
  */
 export function WalletCard({ user, onToast }) {
-  const [editing, setEditing] = useState(false);
+  const [mode, setMode] = useState(null); // null | "add" | "edit"
   const [inputValue, setInputValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -21,26 +20,31 @@ export function WalletCard({ user, onToast }) {
 
   const handleAnimationComplete = useCallback(() => {
     setShowAnimation(false);
-    onToast?.("success", "Wallet balance updated!");
+    onToast?.("success", mode === "add" ? "Money added!" : "Balance updated!");
     window.location.reload();
-  }, [onToast]);
+  }, [onToast, mode]);
 
   useEffect(() => {
-    if (editing && inputRef.current) {
+    if (mode && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
     }
-  }, [editing]);
+  }, [mode]);
 
-  function startEditing() {
-    // Pre-fill with current balance (without "Rs." prefix, just the number)
-    setInputValue(balance.toString());
-    setEditing(true);
+  function startAdd() {
+    setMode("add");
+    setInputValue("");
     setError("");
   }
 
-  function cancelEditing() {
-    setEditing(false);
+  function startEdit() {
+    setMode("edit");
+    setInputValue(balance.toString());
+    setError("");
+  }
+
+  function cancel() {
+    setMode(null);
     setInputValue("");
     setError("");
   }
@@ -54,7 +58,7 @@ export function WalletCard({ user, onToast }) {
     }
 
     const num = parseFloat(trimmed);
-    if (!Number.isFinite(num) || num < 0) {
+    if (!Number.isFinite(num) || num <= 0) {
       setError("Enter a valid positive number.");
       return;
     }
@@ -62,16 +66,20 @@ export function WalletCard({ user, onToast }) {
     setBusy(true);
     setError("");
     try {
+      const body = mode === "add"
+        ? { amount: num, mode: "add" }
+        : { amount: num, mode: "set" };
+
       const res = await fetch("/api/wallet", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: num }),
+        body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not save.");
-      setEditing(false);
+      setMode(null);
       setInputValue("");
-      setSavedAmount(num);
+      setSavedAmount(mode === "add" ? num : data.balance ?? num);
       setShowAnimation(true);
     } catch (err) {
       setError(err.message);
@@ -80,9 +88,10 @@ export function WalletCard({ user, onToast }) {
     }
   }
 
+  const isAdd = mode === "add";
+
   return (
     <>
-      {/* Story-driven wallet update animation */}
       <StoryAnimation
         type="wallet"
         amount={savedAmount}
@@ -98,68 +107,82 @@ export function WalletCard({ user, onToast }) {
               <p className="text-sm font-medium text-slate-500">My Wallet</p>
             </div>
 
-          {editing ? (
-            <form onSubmit={save} className="mt-2 flex items-center gap-2">
-              <span className="text-lg font-semibold text-slate-600">Rs.</span>
-              <input
-                ref={inputRef}
-                type="text"
-                inputMode="decimal"
-                className="input w-40 text-2xl font-bold"
-                placeholder="0.00"
-                value={inputValue}
-                onChange={(e) => {
-                  // Allow only numbers and one decimal point
-                  const v = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
-                  setInputValue(v);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") cancelEditing();
-                }}
-                disabled={busy}
-              />
-              <div className="flex gap-1.5">
-                <button type="submit" disabled={busy} className="btn-primary px-3 py-2 text-sm">
-                  {busy ? (
-                    <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  ) : (
-                    "Save"
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  disabled={busy}
-                  className="btn-ghost px-3 py-2 text-sm"
-                >
-                  Cancel
-                </button>
+            {mode ? (
+              <form onSubmit={save} className="mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-semibold text-slate-600">Rs.</span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    inputMode="decimal"
+                    className="input w-40 text-2xl font-bold"
+                    placeholder={isAdd ? "0.00" : balance.toString()}
+                    value={inputValue}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
+                      setInputValue(v);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") cancel();
+                    }}
+                    disabled={busy}
+                  />
+                  <div className="flex gap-1.5">
+                    <button type="submit" disabled={busy} className="btn-primary px-3 py-2 text-sm">
+                      {busy ? (
+                        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        isAdd ? "Add" : "Save"
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancel}
+                      disabled={busy}
+                      className="btn-ghost px-3 py-2 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <p className="mt-1.5 text-xs text-slate-400">
+                  {isAdd
+                    ? `Adding to current balance of ${formatMoney(balance)}`
+                    : "Set your total wallet balance"}
+                </p>
+              </form>
+            ) : (
+              <div className="mt-1">
+                <p className="text-3xl font-bold text-slate-900">
+                  {formatMoney(balance)}
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={startAdd}
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 active:scale-95"
+                  >
+                    <span>+</span> Add Money
+                  </button>
+                  <button
+                    onClick={startEdit}
+                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 active:scale-95"
+                  >
+                    Edit balance
+                  </button>
+                </div>
               </div>
-            </form>
-          ) : (
-            <div className="mt-1 flex items-baseline gap-3">
-              <p className="text-3xl font-bold text-slate-900">
-                {formatMoney(balance)}
-              </p>
-              <button
-                onClick={startEditing}
-                className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 active:scale-95"
-              >
-                Edit balance
-              </button>
-            </div>
-          )}
+            )}
 
-          <p className="mt-1 text-xs text-slate-400">
-            Your current cash/bank balance. Expenses deduct from this automatically.
-          </p>
+            <p className="mt-2 text-xs text-slate-400">
+              Your current cash/bank balance. Expenses deduct from this automatically.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {error && (
-        <p className="mt-2 text-sm font-medium text-red-600">{error}</p>
-      )}
-    </section>
+        {error && (
+          <p className="mt-2 text-sm font-medium text-red-600">{error}</p>
+        )}
+      </section>
     </>
   );
 }
