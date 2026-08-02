@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 const VIDEO_MAP = {
-  spent: "/spent.mp4.mp4",
-  received: "/received.mp4.mp4",
-  settled: "/received.mp4.mp4",
-  wallet: "/wallet.mp4.mp4",
+  spent: "/spent.mp4.mp4?v=2",
+  received: "/received.mp4.mp4?v=2",
+  settled: "/received.mp4.mp4?v=2",
+  wallet: "/wallet.mp4.mp4?v=2",
 };
 
 const FALLBACK_MS = 10000;
