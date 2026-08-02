@@ -137,7 +137,7 @@ export function QuickCalculator({ show, onClose, onUseResult }) {
     { label: "1", action: () => inputDigit(1), type: "number" },
     { label: "2", action: () => inputDigit(2), type: "number" },
     { label: "3", action: () => inputDigit(3), type: "number" },
-    { label: "=", action: calculate, type: "equals" },
+    { label: "=", action: calculate, type: "equals", tall: true },
 
     { label: "0", action: () => inputDigit(0), type: "number", wide: true },
     { label: ".", action: inputDecimal, type: "number" },
@@ -165,12 +165,14 @@ export function QuickCalculator({ show, onClose, onUseResult }) {
         </div>
 
         {/* Buttons grid */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 grid-rows-[auto] gap-2">
           {buttons.map((btn, i) => (
             <button
               key={i}
               onClick={btn.action}
-              className={`h-14 rounded-xl text-lg font-semibold transition-all active:scale-95 ${
+              className={`rounded-xl text-lg font-semibold transition-all active:scale-95 ${
+                btn.tall ? "row-span-2 h-full" : "h-14"
+              } ${
                 btn.wide ? "col-span-2" : ""
               } ${
                 btn.type === "operator"
