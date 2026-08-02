@@ -119,7 +119,7 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
 function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCelebrate, onDeleteRequest }) {
   const [busy, setBusy] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
-  const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
+  const nameById = Object.fromEntries((members || []).filter(Boolean).map((m) => [m.id, m?.name || "Unknown"]));
 
   const mySplit = expense.splits[currentUserId];
   const isOwner = expense.paidBy === currentUserId;

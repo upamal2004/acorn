@@ -9,7 +9,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 export function AboutPage({ user }) {
   return (
     <div className="min-h-screen bg-slate-50">
-      <DashboardHeader active="about" />
+      <DashboardHeader user={user} active="about" />
 
       <main className="mx-auto max-w-2xl px-6 py-10">
         {/* Hero */}

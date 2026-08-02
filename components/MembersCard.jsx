@@ -46,7 +46,7 @@ export function MembersCard({ members, currentUserId, ownerId, expenses, onChang
         Flatmates
       </h2>
       <ul className="space-y-3">
-        {members.map((m) => {
+        {members.filter(Boolean).map((m) => {
           const s = stats[m.id] || { owes: 0, owedTo: 0, pendingCount: 0 };
           const isMe = m.id === currentUserId;
           const isCreator = m.id === ownerId;
@@ -54,7 +54,7 @@ export function MembersCard({ members, currentUserId, ownerId, expenses, onChang
 
           return (
             <li key={m.id} className="flex items-center gap-3">
-              <Avatar name={m.name} image={m.image} size={34} />
+              <Avatar name={m.name || "Unknown"} image={m.image} size={34} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800">
                   {m.name}
