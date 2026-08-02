@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ConfettiBurst } from "@/components/ConfettiBurst";
-import { ScratSpending } from "@/components/ScratSpending";
-import { ScratReceiving } from "@/components/ScratReceiving";
-import { ScratPiggyBank } from "@/components/ScratPiggyBank";
+import { useEffect, useRef, useState, useCallback } from "react";
 
-/**
- * Full-screen story-driven animation overlay.
- * Shows for 2.5 seconds with smooth fade-out.
- *
- * @param {"spent" | "received" | "settled" | "wallet"} type - Animation type
- * @param {number} amount - Transaction amount
- * @param {string} [label] - Custom label
- * @param {boolean} [show] - Whether to show the animation
- * @param {() => void} [onComplete] - Callback when animation finishes
- */
+const VIDEO_MAP = {
+  spent: "/spent.mp4.mp4",
+  received: "/received.mp4.mp4",
+  settled: "/received.mp4.mp4",
+  wallet: "/wallet.mp4.mp4",
+};
+
+const FALLBACK_MS = 10000;
+
 export function StoryAnimation({ type, amount, label, show = false, onComplete }) {
+  const videoRef = useRef(null);
+  const fallbackRef = useRef(null);
   const [phase, setPhase] = useState("hidden");
+
+  const close = useCallback(() => {
+    setPhase("fading");
+    setTimeout(() => {
+      setPhase("hidden");
+      onComplete?.();
+    }, 400);
+  }, [onComplete]);
 
   useEffect(() => {
     if (!show) {
@@ -26,97 +31,67 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
     }
 
     setPhase("entering");
+    const enterTimer = setTimeout(() => setPhase("visible"), 50);
 
-    const visibleTimer = setTimeout(() => setPhase("visible"), 100);
-    const fadeTimer = setTimeout(() => setPhase("fading"), 1400);
-    const completeTimer = setTimeout(() => {
-      setPhase("hidden");
-      onComplete?.();
-    }, 1700);
+    fallbackRef.current = setTimeout(close, FALLBACK_MS);
 
     return () => {
-      clearTimeout(visibleTimer);
-      clearTimeout(fadeTimer);
-      clearTimeout(completeTimer);
+      clearTimeout(enterTimer);
+      clearTimeout(fallbackRef.current);
     };
-  }, [show, onComplete]);
+  }, [show, close]);
+
+  useEffect(() => {
+    if (phase === "visible" && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [phase]);
 
   if (phase === "hidden") return null;
 
-  const isReceiving = type === "received" || type === "settled";
-  const isWallet = type === "wallet";
+  const src = VIDEO_MAP[type] || VIDEO_MAP.spent;
   const isSpending = type === "spent";
-
-  // Spending gets warm dark overlay, receiving/wallet gets emerald
-  const backdropClass = isSpending
-    ? "bg-black/60"
-    : "bg-black/60";
 
   return (
     <div
-      className={`fixed inset-0 z-[80] flex flex-col items-center justify-center transition-all duration-700 ease-out ${
-        phase === "fading"
-          ? "bg-black/0 opacity-0"
-          : `${backdropClass} opacity-100`
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-300 ${
+        phase === "fading" ? "opacity-0" : "opacity-100"
       }`}
-      style={{ backdropFilter: phase === "fading" ? "blur(0px)" : "blur(12px)" }}
+      style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
     >
-      {/* Confetti for receiving/wallet */}
-      {(isReceiving || isWallet) && phase === "visible" && (
-        <div className="absolute inset-0 pointer-events-none">
-          <ConfettiBurst fire={true} />
-        </div>
-      )}
+      {/* Video */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        onEnded={close}
+        className="max-w-[320px] w-[80vw] max-h-[60vh] rounded-2xl object-contain shadow-2xl"
+        src={src}
+      />
 
-      {/* Main animation container */}
-      <div
-        className={`flex flex-col items-center gap-6 transition-all duration-500 ease-out ${
-          phase === "fading"
-            ? "scale-90 opacity-0"
-            : phase === "entering"
-            ? "scale-95 opacity-0"
-            : "scale-100 opacity-100"
-        }`}
-      >
-        {/* The SVG animation */}
-        <div className="relative">
-          {isSpending && <ScratSpending amount={amount} size={300} />}
-          {(isReceiving) && <ScratReceiving amount={amount} label={label} size={300} />}
-          {isWallet && <ScratPiggyBank amount={amount} size={300} />}
-        </div>
-
-        {/* Amount display */}
-        <div className="text-center">
-          <p
-            className={`text-4xl font-bold tracking-tight ${
-              isSpending ? "text-red-400" : "text-emerald-400"
-            }`}
-          >
-            {isSpending ? "-" : "+"}Rs. {amount?.toLocaleString() || "0"}
-          </p>
-          <p
-            className={`mt-2 text-base font-medium ${
-              isSpending ? "text-red-300" : "text-emerald-300"
-            }`}
-          >
-            {label ||
-              (isSpending && "Expense added") ||
-              (isReceiving && "Money received!") ||
-              (type === "settled" && "Debt settled!") ||
-              (isWallet && "Balance updated!") ||
-              ""}
-          </p>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-48 h-1 overflow-hidden rounded-full bg-white/20">
-          <div
-            className={`h-full rounded-full transition-all duration-[1200ms] ease-linear ${
-              isSpending ? "bg-red-400" : "bg-emerald-400"
-            }`}
-            style={{ width: phase === "fading" || phase === "visible" ? "100%" : "0%" }}
-          />
-        </div>
+      {/* Amount + label */}
+      <div className="mt-5 text-center">
+        <p
+          className={`text-4xl font-bold tracking-tight ${
+            isSpending ? "text-red-400" : "text-emerald-400"
+          }`}
+        >
+          {isSpending ? "-" : "+"}Rs. {amount?.toLocaleString() || "0"}
+        </p>
+        <p
+          className={`mt-2 text-base font-medium ${
+            isSpending ? "text-red-300" : "text-emerald-300"
+          }`}
+        >
+          {label ||
+            (isSpending && "Expense added") ||
+            (type === "received" && "Money received!") ||
+            (type === "settled" && "Debt settled!") ||
+            (type === "wallet" && "Balance updated!") ||
+            ""}
+        </p>
       </div>
     </div>
   );
