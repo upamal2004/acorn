@@ -129,6 +129,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
   const isCreator = expense.createdBy === currentUserId;
   const isShared = splitCount > 1;
   const canDelete = isCreator;
+  // Personal expense: no room and only 1 split
+  const isPersonal = !expense.roomId && splitCount === 1 && expense.splits[currentUserId];
 
   // Long titles and expenses with notes get a "View details" affordance
   const isLong = (expense.title || "").length > 48;
