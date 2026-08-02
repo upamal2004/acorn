@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { formatMoney } from "@/lib/money";
+import { StoryAnimation } from "@/components/StoryAnimation";
 
 /**
  * Personal wallet balance card with inline editing.
@@ -12,9 +13,17 @@ export function WalletCard({ user, onToast }) {
   const [inputValue, setInputValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [savedAmount, setSavedAmount] = useState(0);
   const inputRef = useRef(null);
 
   const balance = user.balance ?? 0;
+
+  const handleAnimationComplete = useCallback(() => {
+    setShowAnimation(false);
+    onToast?.("success", "Wallet balance updated!");
+    window.location.reload();
+  }, [onToast]);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -62,9 +71,8 @@ export function WalletCard({ user, onToast }) {
       if (!res.ok) throw new Error(data.error || "Could not save.");
       setEditing(false);
       setInputValue("");
-      onToast?.("success", "Wallet balance updated!");
-      // Refresh to pick up new server-side data
-      window.location.reload();
+      setSavedAmount(num);
+      setShowAnimation(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,13 +81,22 @@ export function WalletCard({ user, onToast }) {
   }
 
   return (
-    <section className="card card-hover">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">💰</span>
-            <p className="text-sm font-medium text-slate-500">My Wallet</p>
-          </div>
+    <>
+      {/* Story-driven wallet update animation */}
+      <StoryAnimation
+        type="wallet"
+        amount={savedAmount}
+        show={showAnimation}
+        onComplete={handleAnimationComplete}
+      />
+
+      <section className="card card-hover">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💰</span>
+              <p className="text-sm font-medium text-slate-500">My Wallet</p>
+            </div>
 
           {editing ? (
             <form onSubmit={save} className="mt-2 flex items-center gap-2">
@@ -143,5 +160,6 @@ export function WalletCard({ user, onToast }) {
         <p className="mt-2 text-sm font-medium text-red-600">{error}</p>
       )}
     </section>
+    </>
   );
 }

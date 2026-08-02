@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { Avatar } from "@/components/Avatar";
-import { MoneyEmotion } from "@/components/MoneyEmotion";
+import { StoryAnimation } from "@/components/StoryAnimation";
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import { formatMoney } from "@/lib/money";
 import { personalAmount } from "@/lib/history";
@@ -21,8 +21,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [fading, setFading] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   // Compute today's spending per category for limit warnings
   const todaySpending = useMemo(() => {
@@ -80,10 +79,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not add expense.");
-      setSuccess(true);
-      // Show animation for 2.5s, then fade out
-      setTimeout(() => setFading(true), 2000);
-      setTimeout(() => onSaved(), 2500);
+      setShowAnimation(true);
     } catch (err) {
       setError(err.message);
       setBusy(false);
@@ -91,19 +87,21 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
-        {/* Success overlay with spending emotion */}
-        {success && (
-          <div className={`absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl backdrop-blur-md transition-opacity duration-500 sm:rounded-2xl ${
-            fading ? "bg-white/60 opacity-0" : "bg-white/90 opacity-100"
-          }`}>
-            <div className={fading ? "scale-95 opacity-0 transition-all duration-500" : "scale-100 opacity-100 transition-all duration-300"}>
-              <MoneyEmotion type="spent" amount={parseFloat(amount) || 0} fire={true} />
-            </div>
-          </div>
-        )}
+    <>
+      {/* Story-driven spending animation */}
+      <StoryAnimation
+        type="spent"
+        amount={parseFloat(amount) || 0}
+        category={category}
+        show={showAnimation}
+        onComplete={() => {
+          setShowAnimation(false);
+          onSaved();
+        }}
+      />
 
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
+        <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Add expense</h2>
           <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">✕</button>
@@ -190,5 +188,6 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
         </form>
       </div>
     </div>
+    </>
   );
 }
