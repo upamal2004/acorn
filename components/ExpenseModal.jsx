@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Avatar } from "@/components/Avatar";
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import { formatMoney } from "@/lib/money";
 import { personalAmount } from "@/lib/history";
 
-/** Modal form for adding an expense with soft category limit warnings. */
 export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved, user, expenses }) {
   const isPersonal = !roomId;
   const me = members.find((m) => m.id === currentUserId);
@@ -21,6 +20,7 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   // Compute today's spending per category for limit warnings
   const todaySpending = useMemo(() => {
@@ -78,7 +78,8 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not add expense.");
-      onSaved();
+      setSuccess(true);
+      setTimeout(() => onSaved(), 600);
     } catch (err) {
       setError(err.message);
       setBusy(false);
@@ -88,6 +89,18 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved,
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+        {/* Success overlay */}
+        {success && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/95 sm:rounded-2xl">
+            <div className="animate-check-pop flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 12.5l5.5 5.5L20 6.5" />
+              </svg>
+            </div>
+            <p className="mt-3 text-lg font-bold text-slate-900">Expense added!</p>
+          </div>
+        )}
+
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Add expense</h2>
           <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">✕</button>

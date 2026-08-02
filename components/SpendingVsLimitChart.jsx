@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { formatMoney } from "@/lib/money";
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import { personalAmount } from "@/lib/history";
 
-/** Horizontal bar chart comparing spent vs limit per category (or for a single category). */
 export function SpendingVsLimitChart({ expenses, userId, categoryLimits, filterCategory }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(t);
+  }, []);
   const data = useMemo(() => {
     if (!categoryLimits) return [];
 
@@ -58,14 +63,13 @@ export function SpendingVsLimitChart({ expenses, userId, categoryLimits, filterC
             </span>
           </div>
           <div className="relative h-6 w-full overflow-hidden rounded-full bg-slate-100">
-            {/* Limit marker */}
-            <div className="absolute inset-y-0 right-0 w-px bg-slate-400" style={{ left: "100%" }} />
             {/* Spent bar */}
             <div
-              className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+              className="absolute inset-y-0 left-0 rounded-full"
               style={{
-                width: `${c.pct}%`,
+                width: mounted ? `${c.pct}%` : "0%",
                 backgroundColor: c.over ? "#ef4444" : c.pct > 75 ? "#f59e0b" : "#22c55e",
+                transition: "width 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
               }}
             />
             {/* Percentage label */}

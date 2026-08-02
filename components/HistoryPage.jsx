@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
+import { AnimateIn } from "@/components/AnimateIn";
 import { formatMoney } from "@/lib/money";
 import { groupExpensesByDay, personalAmount } from "@/lib/history";
 import { categoryMeta } from "@/lib/categories";
@@ -67,9 +68,9 @@ export function HistoryPage({ user, room, members, expenses }) {
             </Link>
           </section>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 stagger-children">
             {days.map((day) => (
-              <section key={day.dateKey} className="card">
+              <section key={day.dateKey} className="card card-hover">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="min-w-0 break-words text-sm font-semibold text-slate-800">
                     {day.dayName}
@@ -88,7 +89,7 @@ export function HistoryPage({ user, room, members, expenses }) {
                     return (
                       <li
                         key={exp.id}
-                        className="flex items-center gap-3 py-2.5"
+                        className="expense-row flex items-center gap-3 py-2.5"
                       >
                         <div
                           className="flex h-9 w-9 flex-none items-center justify-center rounded-lg text-base"

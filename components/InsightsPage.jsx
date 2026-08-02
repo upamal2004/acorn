@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DailyTrendChart } from "@/components/DailyTrendChart";
 import { SpendingVsLimitChart } from "@/components/SpendingVsLimitChart";
+import { AnimateIn } from "@/components/AnimateIn";
 import { formatMoney } from "@/lib/money";
 import { spendByCategory, monthStats, peakDays } from "@/lib/analytics";
 import { computeSummary } from "@/lib/summary";
@@ -59,7 +60,7 @@ export function InsightsPage({ user, room, members, expenses }) {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
           <StatCard label="Spent this month" value={formatMoney(month.total)} hint={`${month.count} ${month.count === 1 ? "expense" : "expenses"} \u00b7 over ${month.daysElapsed} day${month.daysElapsed === 1 ? "" : "s"}`} />
           <StatCard label="Daily average" value={formatMoney(month.dailyAverage)} hint="month-to-date \u00f7 days elapsed" />
           <StatCard label="You owe" value={formatMoney(summary.iOwe)} hint="unpaid shares in the room" tone={summary.iOwe > 0 ? "danger" : "ok"} />
@@ -67,16 +68,19 @@ export function InsightsPage({ user, room, members, expenses }) {
         </div>
 
         {/* Daily Trend Chart */}
-        <section className="card mt-6">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Daily spending trend</h2>
-            <p className="mt-0.5 text-xs text-slate-400">Your personal share, day by day for the last 14 days.</p>
-          </div>
-          <DailyTrendChart expenses={expenses} userId={user.id} days={14} />
-        </section>
+        <AnimateIn index={1}>
+          <section className="card card-hover mt-6">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-slate-900">Daily spending trend</h2>
+              <p className="mt-0.5 text-xs text-slate-400">Your personal share, day by day for the last 14 days.</p>
+            </div>
+            <DailyTrendChart expenses={expenses} userId={user.id} days={14} />
+          </section>
+        </AnimateIn>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <section className="card lg:col-span-2">
+          <AnimateIn index={2} className="lg:col-span-2">
+            <section className="card card-hover">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">Category distribution</h2>
@@ -124,8 +128,9 @@ export function InsightsPage({ user, room, members, expenses }) {
               </div>
             )}
           </section>
+          </AnimateIn>
 
-          <div className="space-y-6">
+          <AnimateIn index={3} className="space-y-6">
             <section className="card">
               <h2 className="text-lg font-semibold text-slate-900">Peak spending</h2>
               <p className="mt-0.5 text-xs text-slate-400">Your biggest days in the last 30 days.</p>
@@ -170,12 +175,13 @@ export function InsightsPage({ user, room, members, expenses }) {
                 </div>
               </dl>
             </section>
-          </div>
+          </AnimateIn>
         </div>
 
         {/* Spending vs. Limit Chart */}
         {user.categoryLimits && Object.keys(user.categoryLimits).length > 0 && (
-          <section className="card mt-6">
+          <AnimateIn index={4}>
+            <section className="card card-hover mt-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">Spending vs. limit</h2>
@@ -194,6 +200,7 @@ export function InsightsPage({ user, room, members, expenses }) {
             </div>
             <SpendingVsLimitChart expenses={expenses} userId={user.id} categoryLimits={user.categoryLimits} filterCategory={catFilter === "ALL" ? null : catFilter} />
           </section>
+          </AnimateIn>
         )}
       </main>
     </div>
@@ -203,7 +210,7 @@ export function InsightsPage({ user, room, members, expenses }) {
 function StatCard({ label, value, hint, tone = "neutral" }) {
   const toneClass = tone === "danger" ? "text-red-600" : tone === "ok" ? "text-emerald-600" : "text-slate-900";
   return (
-    <section className="card">
+    <section className="card card-hover">
       <p className="text-sm font-medium text-slate-500">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${toneClass}`}>{value}</p>
       <p className="mt-1 text-xs text-slate-400">{hint}</p>

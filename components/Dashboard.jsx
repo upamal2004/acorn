@@ -11,6 +11,8 @@ import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
 import { RecentTransactions } from "@/components/RecentTransactions";
 import { ExpenseModal } from "@/components/ExpenseModal";
+import { AnimateIn } from "@/components/AnimateIn";
+import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { computeSummary, isExpenseActiveForUser } from "@/lib/summary";
 
 const POLL_INTERVAL_MS = 5000;
@@ -35,6 +37,7 @@ export function Dashboard({
   const { user, room, members, expenses } = data;
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const inflight = useRef(false);
 
   // Main "Expenses" feed = only expenses where THIS user still owes money
@@ -131,6 +134,7 @@ export function Dashboard({
 
   return (
     <div className="min-h-screen">
+      <ConfettiBurst fire={showConfetti} />
       <DashboardHeader
         user={user}
         room={room}
@@ -175,70 +179,84 @@ export function Dashboard({
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="min-w-0 space-y-6 lg:col-span-2">
-            <DailySpendingBar
-              user={user}
-              expenses={expenses}
-              onToast={showToast}
-            />
-            <WalletCard user={user} />
-            <ExpenseList
-              expenses={activeExpenses}
-              members={members}
-              currentUserId={user.id}
-              onChanged={refresh}
-              emptyNote={
-                allSettled
-                  ? "Every expense is settled. Past transactions have moved to the History page."
-                  : undefined
-              }
-            />
+            <AnimateIn index={0}>
+              <DailySpendingBar
+                user={user}
+                expenses={expenses}
+                onToast={showToast}
+              />
+            </AnimateIn>
+            <AnimateIn index={1}>
+              <WalletCard user={user} />
+            </AnimateIn>
+            <AnimateIn index={2}>
+              <ExpenseList
+                expenses={activeExpenses}
+                members={members}
+                currentUserId={user.id}
+                onChanged={refresh}
+                emptyNote={
+                  allSettled
+                    ? "Every expense is settled. Past transactions have moved to the History page."
+                    : undefined
+                }
+              />
+            </AnimateIn>
           </div>
 
           <div className="min-w-0 space-y-6">
             {room ? (
               <>
-                <RoomSummary
-                  expenses={expenses}
-                  members={members}
-                  currentUserId={user.id}
-                />
-                <MembersCard
-                  members={members}
-                  currentUserId={user.id}
-                  ownerId={room.ownerId}
-                  expenses={expenses}
-                  onChanged={refresh}
-                />
+                <AnimateIn index={3}>
+                  <RoomSummary
+                    expenses={expenses}
+                    members={members}
+                    currentUserId={user.id}
+                  />
+                </AnimateIn>
+                <AnimateIn index={4}>
+                  <MembersCard
+                    members={members}
+                    currentUserId={user.id}
+                    ownerId={room.ownerId}
+                    expenses={expenses}
+                    onChanged={refresh}
+                  />
+                </AnimateIn>
               </>
             ) : (
-              <div className="card">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Ready to split?
-                </h2>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
-                  You're in personal mode: every expense is just yours. Create
-                  a room or join a friend's with its code to split costs as a
-                  group.
-                </p>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <Link href="/onboarding" className="btn-primary">
-                    Create a room
-                  </Link>
-                  <Link href="/onboarding" className="btn-secondary">
-                    Join a room
-                  </Link>
+              <AnimateIn index={3}>
+                <div className="card card-hover">
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Ready to split?
+                  </h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                    You&apos;re in personal mode: every expense is just yours. Create
+                    a room or join a friend&apos;s with its code to split costs as a
+                    group.
+                  </p>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <Link href="/onboarding" className="btn-primary">
+                      Create a room
+                    </Link>
+                    <Link href="/onboarding" className="btn-secondary">
+                      Join a room
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </AnimateIn>
             )}
           </div>
         </div>
 
-        <RecentTransactions
-          expenses={expenses}
-          members={members}
-          currentUserId={user.id}
-          onToast={showToast}
-        />
+        <AnimateIn index={5}>
+          <RecentTransactions
+            expenses={expenses}
+            members={members}
+            currentUserId={user.id}
+            onToast={showToast}
+          />
+        </AnimateIn>
       </main>
 
       {modalOpen && (
@@ -249,6 +267,8 @@ export function Dashboard({
           onClose={() => setModalOpen(false)}
           onSaved={() => {
             setModalOpen(false);
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 2000);
             refresh();
           }}
           user={user}

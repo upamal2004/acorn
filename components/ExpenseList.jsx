@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/money";
 import { PENDING_VERIFICATION, PAID } from "@/lib/summary";
 import { categoryMeta } from "@/lib/categories";
 import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
+import { successBurst } from "@/components/ConfettiBurst";
 
 /** Chronological list of the expenses involving the signed-in user (the
  *  dashboard feed is filtered server-side to expenses they paid for or were
@@ -90,7 +91,8 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
       const res = await fetch(`/api/expenses/${expense.id}/settle`, {
         method: "POST",
       });
-      if (!res.ok) throw new Error("Could not mark as paid — try again.");
+      if (!res.ok) throw new Error("Could not mark as paid - try again.");
+      successBurst();
       onChanged();
     } catch (err) {
       alert(err.message);
@@ -108,6 +110,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not update settlement.");
+      if (action === "approve") successBurst();
       onChanged();
     } catch (err) {
       alert(err.message);
@@ -130,7 +133,7 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView }) {
   }
 
   return (
-    <li className="py-3.5">
+    <li className="expense-row py-3.5">
       <div className="flex items-center gap-4">
         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-slate-50 text-lg">
           <ExpenseGlyph expense={expense} />

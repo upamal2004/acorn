@@ -61,9 +61,9 @@ export function DashboardHeader({ user, room, active, onToast }) {
               <Link
                 key={link.key}
                 href={link.href}
-                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:scale-[1.04] active:scale-[0.97] ${
                   isActive
-                    ? "bg-acorn-100 text-acorn-700"
+                    ? "bg-acorn-100 text-acorn-700 shadow-sm"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                 }`}
                 aria-current={isActive ? "page" : undefined}

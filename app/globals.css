@@ -5,16 +5,15 @@
 @layer base {
   html {
     @apply antialiased;
-    overflow-x: clip; /* clip (not hidden) so position:sticky keeps working */
+    overflow-x: clip;
   }
 
   body {
     @apply bg-slate-100 text-slate-800;
     overflow-x: clip;
-    overflow-wrap: break-word; /* long names/titles wrap instead of leaking */
+    overflow-wrap: break-word;
   }
 
-  /* Soft acorn radial wash behind everything for a warm feel. */
   #__next,
   body {
     min-height: 100vh;
@@ -31,7 +30,7 @@
 @layer components {
   .card {
     @apply max-w-full rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm;
-    min-width: 0; /* let grid/flex cards shrink instead of overflowing */
+    min-width: 0;
   }
 
   .input {
@@ -40,20 +39,29 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all
       focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 150ms;
   }
 
   .btn-primary {
-    @apply btn bg-acorn-500 text-white hover:bg-acorn-600 focus:ring-acorn-200 active:scale-[0.98];
+    @apply btn bg-acorn-500 text-white hover:bg-acorn-600 focus:ring-acorn-200;
+    &:hover { transform: scale(1.03); }
+    &:active { transform: scale(0.97); }
   }
 
   .btn-secondary {
     @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200;
+    &:hover { transform: scale(1.03); }
+    &:active { transform: scale(0.97); }
   }
 
   .btn-ghost {
     @apply btn text-slate-600 hover:bg-slate-100 focus:ring-slate-200;
+    &:hover { transform: scale(1.03); }
+    &:active { transform: scale(0.97); }
   }
 }
 
@@ -65,22 +73,137 @@
   animation: splash-text-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
 }
 @keyframes splash-logo-in {
-  from {
-    opacity: 0;
-    transform: scale(0.6) translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.6) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes splash-text-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Micro-animations ---------------------------------------------------- */
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0,0,0,0.08), 0 4px 10px -5px rgba(0,0,0,0.04);
+}
+
+/* Progress bar smooth fill from 0 */
+.animate-progress {
+  animation: progress-fill 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+/* Money pulse: green splash for received */
+.animate-money-in {
+  animation: money-in 0.6s ease-out;
+}
+@keyframes money-in {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Money pulse: red splash for spent */
+.animate-money-out {
+  animation: money-out 0.6s ease-out;
+}
+@keyframes money-out {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Money pulse: amber/orange for general success */
+.animate-money-success {
+  animation: money-success 0.6s ease-out;
+}
+@keyframes money-success {
+  0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+}
+
+/* Float-up animation for floating amounts */
+.animate-float-up {
+  animation: float-up 1.2s ease-out forwards;
+}
+@keyframes float-up {
+  0% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-30px); }
+}
+
+/* Success checkmark pop */
+.animate-check-pop {
+  animation: check-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes check-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Shake animation for errors */
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Nav link active indicator slide */
+.nav-active-indicator {
+  position: relative;
+}
+.nav-active-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: width 200ms ease, left 200ms ease;
+}
+.nav-active-indicator:hover::after {
+  width: 60%;
+  left: 20%;
+}
+
+/* Expense row hover */
+.expense-row {
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.expense-row:hover {
+  background-color: rgba(248, 250, 252, 0.8);
+  transform: translateX(2px);
+}
+
+/* Stagger children utility */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: stagger-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+
+@keyframes stagger-in {
+  to { opacity: 1; transform: translateY(0); }
 }

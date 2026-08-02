@@ -1,19 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { formatMoney } from "@/lib/money";
 import { inRange } from "@/lib/analytics";
 import { personalAmount } from "@/lib/history";
 
-/**
- * Daily spending progress bar with warning/alert banners.
- * Shows "Today's Spent: Rs. X / Daily Limit: Rs. Y" with color changes
- * based on percentage (green → yellow → red).
- */
 export function DailySpendingBar({ user, expenses, onToast }) {
   const [editing, setEditing] = useState(false);
   const [limitInput, setLimitInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const dailyLimit = user.dailyLimit; // dollars or null
 
@@ -133,8 +134,8 @@ export function DailySpendingBar({ user, expenses, onToast }) {
       {/* Progress bar */}
       <div className="mb-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
         <div
-          className={`h-full rounded-full transition-all duration-500 ease-out ${barColor}`}
-          style={{ width: `${pct}%` }}
+          className={`h-full rounded-full ${barColor} ${mounted ? "animate-progress" : ""}`}
+          style={{ width: mounted ? `${pct}%` : "0%", transition: "width 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}
         />
       </div>
 
