@@ -60,16 +60,13 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
       }`}
       style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
     >
-      {/* Video with seamless edge blending */}
+      {/* Floating card container */}
       <div
-        className={`relative transition-all duration-300 ease-out ${
+        className={`flex flex-col items-center rounded-2xl border border-slate-700/50 bg-slate-900/90 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out ${
           phase === "entering" ? "scale-90 opacity-0" : "scale-100 opacity-100"
         }`}
-        style={{
-          WebkitMaskImage: "radial-gradient(ellipse 85% 85% at 50% 50%, black 60%, transparent 100%)",
-          maskImage: "radial-gradient(ellipse 85% 85% at 50% 50%, black 60%, transparent 100%)",
-        }}
       >
+        {/* Video */}
         <video
           ref={videoRef}
           autoPlay
@@ -80,28 +77,23 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
           disablePictureInPicture
           disableRemotePlayback
           preload="auto"
-          className="pointer-events-none w-[300px] max-w-[80vw] max-h-[55vh] object-contain"
-          style={{ mixBlendMode: "screen" }}
+          className="pointer-events-none w-[300px] max-w-[80vw] max-h-[55vh] rounded-xl object-contain"
           src={src}
         />
-      </div>
 
-      {/* Amount + label */}
-      <div
-        className={`mt-6 text-center transition-all duration-300 ease-out ${
-          phase === "entering" ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
-        }`}
-      >
+        {/* Amount */}
         <p
-          className={`text-4xl font-bold tracking-tight ${
+          className={`mt-4 text-center text-3xl font-bold tracking-tight ${
             isSpending ? "text-red-400" : "text-emerald-400"
           }`}
         >
           {isSpending ? "-" : "+"}Rs. {amount?.toLocaleString() || "0"}
         </p>
+
+        {/* Label */}
         <p
-          className={`mt-2 text-base font-medium ${
-            isSpending ? "text-red-300" : "text-emerald-300"
+          className={`mt-1 text-center text-sm font-medium ${
+            isSpending ? "text-red-300/80" : "text-emerald-300/80"
           }`}
         >
           {label ||
