@@ -12,17 +12,19 @@ import { ExpenseDetailModal } from "@/components/ExpenseDetailModal";
  *  split with). Each row shows the user's own share, a settle → verify
  *  workflow, and — for long titles or expenses with notes — a "View details"
  *  affordance that opens the full-expense modal. */
-export function ExpenseList({ expenses, members, currentUserId, onChanged }) {
+export function ExpenseList({ expenses, members, currentUserId, onChanged, emptyNote }) {
   const [detailExpense, setDetailExpense] = useState(null);
 
   if (!expenses.length) {
     return (
       <section className="card border-dashed text-center">
         <p className="text-3xl">🧾</p>
-        <h2 className="mt-2 text-lg font-semibold text-slate-800">No expenses yet</h2>
+        <h2 className="mt-2 text-lg font-semibold text-slate-800">
+          {emptyNote ? "All settled" : "No expenses yet"}
+        </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Add an expense — rent, groceries, that takeaway — and it shows up here
-          for you and whoever you split it with.
+          {emptyNote ??
+            "Add an expense — rent, groceries, that takeaway — and it shows up here for you and whoever you split it with."}
         </p>
       </section>
     );

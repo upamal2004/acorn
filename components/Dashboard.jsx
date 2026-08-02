@@ -3,19 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { Logo } from "@/components/Logo";
-import { Avatar } from "@/components/Avatar";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { WalletCard } from "@/components/WalletCard";
 import { RoomSummary } from "@/components/RoomSummary";
 import { MembersCard } from "@/components/MembersCard";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseModal } from "@/components/ExpenseModal";
-import { ExpenseHistory } from "@/components/ExpenseHistory";
-import { AnalyticsModal } from "@/components/AnalyticsModal";
-import { SettingsModal } from "@/components/SettingsModal";
-import { filterMyExpenses } from "@/lib/history";
-import { computeSummary } from "@/lib/summary";
+import { computeSummary, isExpenseActive } from "@/lib/summary";
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -38,19 +32,18 @@ export function Dashboard({
   });
   const { user, room, members, expenses } = data;
   const [modalOpen, setModalOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const inflight = useRef(false);
 
-  // The History tab only shows the logged-in user's own activity — expenses
-  // they added, paid for, or were split into — never other members' unrelated
-  // room expenses.
-  const myExpenses = useMemo(
-    () => filterMyExpenses(expenses, user.id),
-    [expenses, user.id]
+  // Main "Expenses" feed = only active (unsettled) expenses: anything still
+  // owed or awaiting verification. Fully settled transactions automatically
+  // drop out of this view and live on the History page. In personal (solo)
+  // mode there are no debts to hide, so everything stays visible.
+  const activeExpenses = useMemo(
+    () => (room ? expenses.filter(isExpenseActive) : expenses),
+    [expenses, room]
   );
+  const allSettled = room && expenses.length > 0 && activeExpenses.length === 0;
 
   /** Pull the freshest data from the database without touching the DOM. */
   const refresh = useCallback(async () => {
@@ -133,51 +126,14 @@ export function Dashboard({
     }
   }
 
-  async function handleSignOut() {
-    // next-auth's signOut fetches a CSRF token, POSTs it to /api/auth/signout
-    // (clearing the session cookie server-side), then hard-navigates to /login.
-    // The old manual fetch skipped the CSRF step, so the session never ended and
-    // /login bounced straight back to /dashboard.
-    try {
-      await signOut({ callbackUrl: "/login" });
-    } catch {
-      showToast("error", "Could not sign out. Please try again.");
-    }
-  }
-
   return (
     <div className="min-h-screen">
-      {/* Top bar */}
-      <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3.5">
-          <Link href="/dashboard" aria-label="Acorn dashboard">
-            <Logo size={26} />
-          </Link>
-          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-            {room && (
-              <span className="hidden rounded-full bg-acorn-100 px-3 py-1 font-mono text-xs font-semibold text-acorn-700 sm:inline">
-                {room.code}
-              </span>
-            )}
-            <Avatar name={user.name} image={user.image} size={32} />
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="btn-ghost px-2.5 py-2"
-              title="Account settings"
-            >
-              <GearIcon />
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="btn-ghost px-3 py-1.5 text-xs"
-              title="Sign out"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
+      <DashboardHeader
+        user={user}
+        room={room}
+        active="dashboard"
+        onToast={showToast}
+      />
       <main className="mx-auto w-full max-w-5xl px-6 py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -208,22 +164,6 @@ export function Dashboard({
                 <DoorIcon /> Leave room
               </button>
             )}
-            {expenses.length > 0 && (
-              <button
-                onClick={() => setAnalyticsOpen(true)}
-                className="btn-secondary"
-              >
-                <ChartIcon /> Insights
-              </button>
-            )}
-            {myExpenses.length > 0 && (
-              <button
-                onClick={() => setHistoryOpen(true)}
-                className="btn-secondary"
-              >
-                <CalendarIcon /> History
-              </button>
-            )}
             <button onClick={() => setModalOpen(true)} className="btn-primary">
               <PlusIcon /> Add expense
             </button>
@@ -234,10 +174,15 @@ export function Dashboard({
           <div className="min-w-0 space-y-6 lg:col-span-2">
             <WalletCard user={user} />
             <ExpenseList
-              expenses={expenses}
+              expenses={activeExpenses}
               members={members}
               currentUserId={user.id}
               onChanged={refresh}
+              emptyNote={
+                allSettled
+                  ? "Every expense is settled. Past transactions have moved to the History page."
+                  : undefined
+              }
             />
           </div>
 
@@ -294,31 +239,6 @@ export function Dashboard({
         />
       )}
 
-      {historyOpen && (
-        <ExpenseHistory
-          expenses={myExpenses}
-          members={members}
-          currentUserId={user.id}
-          onClose={() => setHistoryOpen(false)}
-        />
-      )}
-
-      {analyticsOpen && (
-        <AnalyticsModal
-          expenses={expenses}
-          currentUserId={user.id}
-          onClose={() => setAnalyticsOpen(false)}
-        />
-      )}
-
-      {settingsOpen && (
-        <SettingsModal
-          user={user}
-          onClose={() => setSettingsOpen(false)}
-          onToast={showToast}
-        />
-      )}
-
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4">
           <div
@@ -338,33 +258,6 @@ function PlusIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M8 2v4M16 2v4M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function ChartIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 4v16h16M8 16l3-4 3 3 4-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
     </svg>
   );
 }
