@@ -1,4 +1,4 @@
-// PATCH /api/account/password — verify the user's current password and set a
+﻿// PATCH /api/account/password -- verify the user's current password and set a
 // new one. The caller must be signed in; credentials users are always verified
 // against their stored bcrypt hash before any change is made.
 import { ok, bad, requireUser } from "@/lib/api";

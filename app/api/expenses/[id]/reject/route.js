@@ -1,4 +1,4 @@
-// POST /api/expenses/[id]/reject — the expense's payer sends a member's
+// POST /api/expenses/[id]/reject -- the expense's payer sends a member's
 // marked-as-paid share back to unpaid so they can settle again. No balance
 // changes (none were made while it was awaiting approval).
 import { ok, bad, requireUser } from "@/lib/api";

@@ -1,8 +1,8 @@
-// POST /api/expenses — add an expense and split it equally between the
+﻿// POST /api/expenses -- add an expense and split it equally between the
 // selected members. Server-side membership checks make sure nobody can touch
 // a room they don't belong to. The creator is always the payer: whatever
 // `paidBy` a client sends is ignored and the current user is used instead.
-// The split is exactly what the client selected — the creator may include
+// The split is exactly what the client selected -- the creator may include
 // themselves or not. If they're left out, the full amount is shared among the
 // selected members only and the creator is owed the total. Without a roomId
 // the expense is a personal one (solo mode): it's paid by and split only with
@@ -28,7 +28,7 @@ export async function POST(req) {
     return bad("Amount must be a number greater than zero.");
   }
 
-  // Category is optional — anything invalid (or missing) falls back to Others.
+  // Category is optional -- anything invalid (or missing) falls back to Others.
   const cleanCategory = isValidCategory(category) ? category : "OTHERS";
 
   let cleanSplit;
@@ -46,7 +46,7 @@ export async function POST(req) {
     );
     if (!cleanSplit.length) return bad("Pick at least one member to split with.");
   } else {
-    // Personal (solo) expense — you pay it yourself.
+    // Personal (solo) expense -- you pay it yourself.
     cleanSplit = [user.id];
   }
 
@@ -67,7 +67,7 @@ export async function POST(req) {
     const perShare = Math.round(toCents(parsedAmount) / cleanSplit.length);
     sendPushToUsers(notifyUserIds, {
       title: "New expense added",
-      body: `${title} — ${formatMoney(parsedAmount)} split ${cleanSplit.length} ways. Your share: ${formatMoney(fromCents(perShare))}.`,
+      body: `${title} -- ${formatMoney(parsedAmount)} split ${cleanSplit.length} ways. Your share: ${formatMoney(fromCents(perShare))}.`,
       tag: `expense-${expenseId}`,
       url: "/dashboard",
     }).catch(() => {});

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -25,7 +25,7 @@ function urlBase64ToUint8Array(base64String) {
  * and stores the subscription via /api/push/subscribe. Automatically cleans
  * up expired subscriptions on unmount.
  *
- * Renders nothing visible — it's a headless effect component.
+ * Renders nothing visible -- it's a headless effect component.
  */
 export function PushManager() {
   const registered = useRef(false);
@@ -50,7 +50,7 @@ export function PushManager() {
           return;
         }
 
-        // Not yet subscribed — request permission.
+        // Not yet subscribed -- request permission.
         if (Notification.permission === "default") {
           const result = await Notification.requestPermission();
           if (result !== "granted") return;
@@ -65,7 +65,7 @@ export function PushManager() {
 
         await syncSubscription(subscription);
       } catch {
-        // SW registration or subscription failed — silently ignore. Push is
+        // SW registration or subscription failed -- silently ignore. Push is
         // best-effort; the app works fine without it.
       }
     })();
@@ -106,10 +106,10 @@ async function syncSubscription(subscription) {
       body: JSON.stringify({ endpoint, p256dh: keys.p256dh, auth: keys.auth }),
     });
     if (!res.ok) {
-      // Server rejected — unsubscribe so we can try fresh next time.
+      // Server rejected -- unsubscribe so we can try fresh next time.
       await subscription.unsubscribe().catch(() => {});
     }
   } catch {
-    // Network error — will retry on next page load.
+    // Network error -- will retry on next page load.
   }
 }

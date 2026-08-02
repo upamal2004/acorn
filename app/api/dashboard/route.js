@@ -1,4 +1,4 @@
-// GET /api/dashboard — one aggregate payload for the dashboard:
+﻿// GET /api/dashboard -- one aggregate payload for the dashboard:
 // the current user, their room, the member list and all expenses.
 // Without a room the payload describes personal (solo) mode: the member list
 // is just the user and expenses are their own room-less tracking.

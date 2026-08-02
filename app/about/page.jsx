@@ -1,10 +1,10 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/queries";
 import { AboutPage } from "@/components/AboutPage";
 
 export const metadata = {
-  title: "About — Acorn",
+  title: "About -- Acorn",
 };
 
 export default async function About() {

@@ -1,4 +1,4 @@
-// POST /api/push/subscribe — store a Web Push subscription for the
+﻿// POST /api/push/subscribe -- store a Web Push subscription for the
 // authenticated user. The client calls this after the service worker
 // registers and the user grants notification permission.
 import { ok, bad, requireUser } from "@/lib/api";
@@ -15,7 +15,7 @@ export async function POST(req) {
     return bad("Missing subscription fields (endpoint, p256dh, auth).");
   }
 
-  // Upsert by endpoint — a single device re-subscribing just refreshes the row.
+  // Upsert by endpoint -- a single device re-subscribing just refreshes the row.
   await prisma.pushSubscription.upsert({
     where: { endpoint },
     update: { userId: user.id, p256dh, auth },

@@ -1,4 +1,4 @@
-// DELETE /api/expenses/[id] — remove an expense entry. Only the user who
+// DELETE /api/expenses/[id] -- remove an expense entry. Only the user who
 // added the entry may delete it; all wallet movements it caused are reversed.
 import { ok, bad, requireUser } from "@/lib/api";
 import { deleteExpense } from "@/lib/queries";

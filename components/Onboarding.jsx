@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { Avatar } from "@/components/Avatar";
 
 /**
  * First-run screen for a user with no room yet: either create a new room or
- * join an existing one with its ACORN code. Rooms are optional — users can
+ * join an existing one with its ACORN code. Rooms are optional -- users can
  * skip straight to their personal-mode dashboard.
  */
 export function Onboarding({ user }) {

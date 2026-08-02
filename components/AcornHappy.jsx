@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 /**
- * Scrat-inspired happy/victorious reaction — shown when receiving money.
+ * Scrat-inspired happy/victorious reaction -- shown when receiving money.
  * Saber-toothed squirrel triumphantly holding his precious acorn!
  * Pure inline SVG with celebratory animations.
  */

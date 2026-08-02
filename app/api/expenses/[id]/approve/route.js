@@ -1,4 +1,4 @@
-// POST /api/expenses/[id]/approve — the expense's payer confirms that a
+// POST /api/expenses/[id]/approve -- the expense's payer confirms that a
 // member's marked-as-paid share was actually received. This is the only point
 // where settlement balances move: the settling member's wallet drops by their
 // share and the payer's wallet rises by that share.

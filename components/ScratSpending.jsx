@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Money Spent / Debt Paid: Cute front-facing squirrel crying
@@ -78,29 +78,29 @@ export function ScratSpending({ amount, size = 300 }) {
 
         {/* === FACE === */}
 
-        {/* Eyes — large, round, adorable */}
+        {/* Eyes -- large, round, adorable */}
         <circle cx="134" cy="170" r="12" fill="white" />
         <circle cx="166" cy="170" r="12" fill="white" />
 
-        {/* Pupils — big, dark, with shimmer */}
+        {/* Pupils -- big, dark, with shimmer */}
         <circle cx="136" cy="172" r="8" fill="#3D2B1F" />
         <circle cx="168" cy="172" r="8" fill="#3D2B1F" />
 
-        {/* Eye highlights — big sparkle */}
+        {/* Eye highlights -- big sparkle */}
         <circle cx="132" cy="167" r="3.5" fill="white" />
         <circle cx="164" cy="167" r="3.5" fill="white" />
         <circle cx="140" cy="175" r="1.8" fill="white" opacity="0.7" />
         <circle cx="172" cy="175" r="1.8" fill="white" opacity="0.7" />
 
-        {/* Eyebrows — worried, angled down */}
+        {/* Eyebrows -- worried, angled down */}
         <path d="M122 155 Q130 149 142 155" stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M158 155 Q170 149 178 155" stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round" />
 
-        {/* Nose — small, cute */}
+        {/* Nose -- small, cute */}
         <ellipse cx="150" cy="188" rx="5" ry="4" fill="#6B3A2A" />
         <ellipse cx="150" cy="187" rx="2" ry="1.2" fill="#8B5E3C" opacity="0.5" />
 
-        {/* Mouth — sad frown */}
+        {/* Mouth -- sad frown */}
         <path d="M140 198 Q145 194 150 198 Q155 194 160 198" stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round" />
 
         {/* Blush */}

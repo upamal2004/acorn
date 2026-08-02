@@ -1,5 +1,5 @@
-// ---------------------------------------------------------------------------
-// auth.js — Auth.js (NextAuth v5) configuration for email/password + Google
+﻿// ---------------------------------------------------------------------------
+// auth.js -- Auth.js (NextAuth v5) configuration for email/password + Google
 // OAuth authentication.
 //
 // Users are created via /api/register (bcrypt-hashed passwords) or

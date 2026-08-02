@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Wallet top-up: Same happy Scrat catching money, with coin-drops.
@@ -59,7 +59,7 @@ export function ScratPiggyBank({ amount, size = 300 }) {
           <ellipse cx="153" cy="232" rx="30" ry="22" fill="#E8D4B8" />
           <ellipse cx="155" cy="236" rx="18" ry="13" fill="#F0E0CC" opacity="0.6" />
 
-          {/* Tail — raised, wagging */}
+          {/* Tail -- raised, wagging */}
           <g className="origin-bottom-left animate-[tail-wag-fast_0.4s_ease-in-out_infinite]">
             <path d="M105 215 Q80 185 72 155 Q68 140 80 135 Q92 130 94 150 Q100 180 110 212" fill="#C4956A" />
             <path d="M100 200 Q85 172 80 155 Q77 143 85 140" stroke="#E8D4B8" strokeWidth="2.5" fill="none" opacity="0.4" />
@@ -68,7 +68,7 @@ export function ScratPiggyBank({ amount, size = 300 }) {
           {/* Head */}
           <ellipse cx="150" cy="170" rx="32" ry="26" fill="#C4956A" />
 
-          {/* Ears — excited */}
+          {/* Ears -- excited */}
           <g className="animate-[ears-excite_0.5s_ease-in-out_infinite]">
             <ellipse cx="124" cy="140" rx="10" ry="15" fill="#C4956A" transform="rotate(-8 124 140)" />
             <ellipse cx="124" cy="140" rx="6.5" ry="11" fill="#E8B4B4" transform="rotate(-8 124 140)" />

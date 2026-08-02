@@ -1,4 +1,4 @@
-// PATCH /api/account/daily-limit — set the user's daily spending limit in cents.
+﻿// PATCH /api/account/daily-limit -- set the user's daily spending limit in cents.
 // Pass null to remove the limit.
 import { ok, bad, requireUser } from "@/lib/api";
 import { prisma } from "@/lib/db";

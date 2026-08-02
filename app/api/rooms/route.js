@@ -1,4 +1,4 @@
-// POST /api/rooms — create a new room owned by the signed-in user.
+﻿// POST /api/rooms -- create a new room owned by the signed-in user.
 // Generates a unique ACORN-XXX code (retrying on the rare collision).
 import { ok, bad, requireUser } from "@/lib/api";
 import { getUser, createRoom } from "@/lib/queries";

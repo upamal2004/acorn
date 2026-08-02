@@ -1,5 +1,5 @@
-// POST /api/expenses/[id]/settle — mark the caller's share as
-// PENDING_VERIFICATION ("I paid — awaiting the payer's approval"). Balances
+// POST /api/expenses/[id]/settle -- mark the caller's share as
+// PENDING_VERIFICATION ("I paid -- awaiting the payer's approval"). Balances
 // only move once the expense's payer approves (see /approve). The query only
 // matches a share that belongs to the caller, so users can only ever settle
 // their own part.

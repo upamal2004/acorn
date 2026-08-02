@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 /**
- * Minimal loading indicator — clean pulsing dot spinner.
+ * Minimal loading indicator -- clean pulsing dot spinner.
  */
 export function ScratLoading({ size = 40, text = "Saving...", className = "" }) {
   return (

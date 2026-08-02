@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 /**
  * Animated Scrat chasing a bouncing acorn.
- * Pure inline SVG — no external assets required.
+ * Pure inline SVG -- no external assets required.
  * Used in the splash screen and loading states.
  */
 export function ScratChasingAcorn({ size = 120, className = "" }) {

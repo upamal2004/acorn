@@ -1,4 +1,4 @@
-// POST /api/register — create an email/password account.
+﻿// POST /api/register -- create an email/password account.
 import { ok, bad } from "@/lib/api";
 import { createUser, findUserByEmail } from "@/lib/queries";
 import { hashPassword } from "@/lib/password";

@@ -1,4 +1,4 @@
-// POST /api/push/unsubscribe — remove a Web Push subscription (e.g. when the
+﻿// POST /api/push/unsubscribe -- remove a Web Push subscription (e.g. when the
 // user disables notifications or the service worker re-subscribes).
 import { ok, bad, requireUser } from "@/lib/api";
 import { prisma } from "@/lib/db";

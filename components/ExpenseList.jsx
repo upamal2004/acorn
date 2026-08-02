@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from "react";
 import { StoryAnimation } from "@/components/StoryAnimation";
@@ -114,7 +114,7 @@ export function ExpenseList({ expenses, members, currentUserId, onChanged, empty
 }
 
 /**
- * Individual expense row. No modals rendered here — confirmation is handled by parent.
+ * Individual expense row. No modals rendered here -- confirmation is handled by parent.
  */
 function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCelebrate, onDeleteRequest }) {
   const [busy, setBusy] = useState(false);

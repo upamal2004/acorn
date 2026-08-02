@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 /**
- * Scrat-inspired sad/devastated reaction — shown when spending money.
+ * Scrat-inspired sad/devastated reaction -- shown when spending money.
  * Saber-toothed squirrel losing his acorn, dramatic exaggerated sadness.
  * Pure inline SVG with expressive animations.
  */

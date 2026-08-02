@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
 /** Password field with a show/hide (eye) toggle. Drop-in for `<input
- *  type="password">` — accepts the same props, plus an optional `name`/`id`. */
+ *  type="password">` -- accepts the same props, plus an optional `name`/`id`. */
 export function PasswordInput({
   value,
   onChange,

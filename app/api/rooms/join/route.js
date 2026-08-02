@@ -1,4 +1,4 @@
-// POST /api/rooms/join — join an existing room using its ACORN-XXX code.
+﻿// POST /api/rooms/join -- join an existing room using its ACORN-XXX code.
 import { ok, bad, requireUser } from "@/lib/api";
 import { getUser, joinRoom } from "@/lib/queries";
 import { normalizeRoomCode, isValidRoomCode } from "@/lib/room-code";

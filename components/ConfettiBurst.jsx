@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
@@ -37,7 +37,7 @@ function burst() {
   }
 }
 
-/** Quick success checkmark burst — smaller and faster. */
+/** Quick success checkmark burst -- smaller and faster. */
 export function successBurst() {
   try {
     confetti({
@@ -83,7 +83,7 @@ export function celebrationBurst() {
   } catch { /* noop */ }
 }
 
-/** Sad trombone effect — subtle orange/red particles fading down for spending. */
+/** Sad trombone effect -- subtle orange/red particles fading down for spending. */
 export function spendBurst() {
   try {
     confetti({

@@ -1,4 +1,4 @@
-// PATCH /api/account/category-limits — set per-category spending limits.
+﻿// PATCH /api/account/category-limits -- set per-category spending limits.
 // Pass a JSON object { "FOOD": 5000, "TRANSPORT": 3000 } (values in dollars).
 // Pass null or {} to remove all category limits.
 import { ok, bad, requireUser } from "@/lib/api";

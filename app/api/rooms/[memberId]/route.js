@@ -1,4 +1,4 @@
-// DELETE /api/rooms/[memberId] — the room creator removes a member from the
+// DELETE /api/rooms/[memberId] -- the room creator removes a member from the
 // room. Only the owner may do this; the removed member goes back to personal
 // (solo) mode. The owner can't remove themselves (use Leave room instead).
 import { ok, bad, requireUser } from "@/lib/api";
@@ -21,7 +21,7 @@ export async function DELETE(_req, { params }) {
     return bad("Only the room creator can remove members.", 403);
   }
   if (memberId === user.id) {
-    return bad("You can't remove yourself — use Leave room instead.", 400);
+    return bad("You can't remove yourself -- use Leave room instead.", 400);
   }
 
   try {

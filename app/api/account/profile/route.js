@@ -1,4 +1,4 @@
-// PATCH /api/account/profile — update the user's display name.
+﻿// PATCH /api/account/profile -- update the user's display name.
 import { ok, bad, requireUser } from "@/lib/api";
 import { prisma } from "@/lib/db";
 

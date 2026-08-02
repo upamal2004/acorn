@@ -1,4 +1,4 @@
-// POST /api/auth/forgot-password — issue a secure, single-use reset link.
+﻿// POST /api/auth/forgot-password -- issue a secure, single-use reset link.
 //
 // Returns the same generic message whether or not the email exists so the
 // endpoint can't be used to enumerate accounts. When email delivery is
@@ -37,7 +37,7 @@ export async function POST(req) {
 
   if (result.reason === "not_configured") {
     if (process.env.RESET_DEV_LINKS === "true") {
-      // Dev mode — no sender configured, so hand the link back for testing.
+      // Dev mode -- no sender configured, so hand the link back for testing.
       return ok({ message: GENERIC_OK, devResetUrl: resetUrl });
     }
     return bad("Password reset emails aren't configured yet. Please try again later.", 503);

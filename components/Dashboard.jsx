@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -18,8 +18,8 @@ import { computeSummary, isExpenseActiveForUser } from "@/lib/summary";
 const POLL_INTERVAL_MS = 5000;
 
 /** Main signed-in screen. Server-rendered data seeds the client state, then
- *  everything is kept in sync with silent AJAX fetches of /api/dashboard — on
- *  a visibility-aware polling loop and after every mutation — so changes by
+ *  everything is kept in sync with silent AJAX fetches of /api/dashboard -- on
+ *  a visibility-aware polling loop and after every mutation -- so changes by
  *  another member show up without reloading the page. */
 export function Dashboard({
   user: initialUser,
@@ -41,7 +41,7 @@ export function Dashboard({
 
   // Main "Expenses" feed = only expenses where THIS user still owes money
   // or needs to verify a received payment. Once the user has settled their
-  // share, the expense drops out of their feed automatically — even if other
+  // share, the expense drops out of their feed automatically -- even if other
   // members still owe. In personal (solo) mode there are no debts to hide,
   // so everything stays visible.
   const activeExpenses = useMemo(
@@ -69,7 +69,7 @@ export function Dashboard({
         expenses: payload.expenses,
       });
     } catch {
-      // Transient network error — keep showing the last known data.
+      // Transient network error -- keep showing the last known data.
     } finally {
       inflight.current = false;
     }
@@ -104,7 +104,7 @@ export function Dashboard({
   }
 
   async function leaveRoom() {
-    // You can't walk away while you still owe the room money — settle first.
+    // You can't walk away while you still owe the room money -- settle first.
     const { iOwe, net } = computeSummary(expenses, user.id);
     if (iOwe > 0 || net < 0) {
       showToast(

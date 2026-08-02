@@ -1,4 +1,4 @@
-// DELETE /api/account — permanently delete the user's account.
+﻿// DELETE /api/account -- permanently delete the user's account.
 // Removes all owned data: expenses, shares, push subscriptions, room membership,
 // and the user row. If the user owns a room, the room is deleted too (cascade).
 import { ok, bad, requireUser } from "@/lib/api";

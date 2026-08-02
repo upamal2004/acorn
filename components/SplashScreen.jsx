@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 
 /**
- * Clean splash screen — logo + brand lockup with a minimal pulse.
+ * Clean splash screen -- logo + brand lockup with a minimal pulse.
  * No character graphics.
  */
 export function SplashScreen() {

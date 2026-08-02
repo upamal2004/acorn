@@ -1,4 +1,4 @@
-// public/sw.js — Service Worker for Web Push notifications.
+﻿// public/sw.js -- Service Worker for Web Push notifications.
 // Receives push events from the server and shows native notifications.
 // Clicking a notification opens/focuses the app dashboard.
 

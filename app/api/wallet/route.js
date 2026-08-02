@@ -1,4 +1,4 @@
-// PATCH /api/wallet — update the caller's personal wallet balance.
+﻿// PATCH /api/wallet -- update the caller's personal wallet balance.
 // Supports two modes:
 //   - "set": Set balance to the given amount (default)
 //   - "add": Add amount to current balance

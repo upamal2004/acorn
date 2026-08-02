@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -31,7 +31,7 @@ export function SignupForm() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not create your account.");
 
-      // Account created — sign in with the same credentials.
+      // Account created -- sign in with the same credentials.
       const signInRes = await signIn("credentials", {
         email,
         password,

@@ -1,4 +1,4 @@
-// POST /api/rooms/leave — leave the current room and go back to personal mode.
+﻿// POST /api/rooms/leave -- leave the current room and go back to personal mode.
 // Works for any member, including the room creator, but only once all their
 // outstanding debts are settled ("You owe" must be Rs. 0.00).
 import { ok, bad, requireUser } from "@/lib/api";

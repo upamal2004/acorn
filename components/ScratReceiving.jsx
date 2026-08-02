@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Money Received / Wallet Top-up: Large happy Scrat catches floating money
@@ -52,23 +52,23 @@ export function ScratReceiving({ amount, label = "Money received!", size = 300 }
 
         {/* === SCRAT (large, happy, catching money) === */}
         <g className="animate_[scrat-hop_2s_ease-in-out_infinite]">
-          {/* Body — large and round */}
+          {/* Body -- large and round */}
           <ellipse cx="150" cy="228" rx="42" ry="32" fill="#C4956A" />
           <ellipse cx="153" cy="232" rx="30" ry="22" fill="#E8D4B8" />
 
           {/* Belly patch */}
           <ellipse cx="155" cy="236" rx="18" ry="13" fill="#F0E0CC" opacity="0.6" />
 
-          {/* Tail — raised high, wagging */}
+          {/* Tail -- raised high, wagging */}
           <g className="origin-bottom-left animate-[tail-wag-fast_0.4s_ease-in-out_infinite]">
             <path d="M105 215 Q80 185 72 155 Q68 140 80 135 Q92 130 94 150 Q100 180 110 212" fill="#C4956A" />
             <path d="M100 200 Q85 172 80 155 Q77 143 85 140" stroke="#E8D4B8" strokeWidth="2.5" fill="none" opacity="0.4" />
           </g>
 
-          {/* Head — large */}
+          {/* Head -- large */}
           <ellipse cx="150" cy="170" rx="32" ry="26" fill="#C4956A" />
 
-          {/* Ears — perked up with excitement */}
+          {/* Ears -- perked up with excitement */}
           <g className="animate-[ears-excite_0.5s_ease-in-out_infinite]">
             <ellipse cx="124" cy="140" rx="10" ry="15" fill="#C4956A" transform="rotate(-8 124 140)" />
             <ellipse cx="124" cy="140" rx="6.5" ry="11" fill="#E8B4B4" transform="rotate(-8 124 140)" />
@@ -81,7 +81,7 @@ export function ScratReceiving({ amount, label = "Money received!", size = 300 }
           <circle cx="188" cy="173" r="5" fill="#3D2B1F" />
           <circle cx="189" cy="172" r="1.5" fill="white" opacity="0.6" />
 
-          {/* Eyes — happy squint */}
+          {/* Eyes -- happy squint */}
           <path d="M133 162 Q141 154 149 162" stroke="#3D2B1F" strokeWidth="4" fill="none" strokeLinecap="round" />
           <path d="M153 162 Q161 154 169 162" stroke="#3D2B1F" strokeWidth="4" fill="none" strokeLinecap="round" />
 
@@ -95,7 +95,7 @@ export function ScratReceiving({ amount, label = "Money received!", size = 300 }
           <rect x="150" y="192" width="3.5" height="6" rx="1.5" fill="white" />
           <rect x="157" y="192" width="3.5" height="6" rx="1.5" fill="white" />
 
-          {/* Front paws — up in catching position */}
+          {/* Front paws -- up in catching position */}
           <g className="animate_[paws-catch_2s_ease-in-out_infinite]">
             <path d="M118 225 Q108 200 100 185" stroke="#C4956A" strokeWidth="8" strokeLinecap="round" fill="none" />
             <circle cx="100" cy="185" r="7" fill="#D4A882" />
@@ -103,7 +103,7 @@ export function ScratReceiving({ amount, label = "Money received!", size = 300 }
             <circle cx="200" cy="185" r="7" fill="#D4A882" />
           </g>
 
-          {/* Back legs — standing strong */}
+          {/* Back legs -- standing strong */}
           <path d="M115 255 Q105 268 98 275" stroke="#C4956A" strokeWidth="8" strokeLinecap="round" fill="none" />
           <ellipse cx="98" cy="275" rx="8" ry="5" fill="#D4A882" />
           <path d="M140 255 Q130 268 123 275" stroke="#C4956A" strokeWidth="8" strokeLinecap="round" fill="none" />

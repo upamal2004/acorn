@@ -1,4 +1,4 @@
-// POST /api/auth/reset-password — set a new password from a reset link.
+﻿// POST /api/auth/reset-password -- set a new password from a reset link.
 //
 // Validates the token hash against the stored value and its expiry, then
 // replaces the password and clears the token so it can't be replayed.

@@ -1,4 +1,4 @@
-// PATCH /api/account/room-name — update the room name (creator only).
+﻿// PATCH /api/account/room-name -- update the room name (creator only).
 import { ok, bad, requireUser } from "@/lib/api";
 import { prisma } from "@/lib/db";
 

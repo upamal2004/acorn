@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 
 const HISTORY_DAYS = 30;
 
-/** Dedicated /history page — the logged-in user's own transactions from the
+/** Dedicated /history page -- the logged-in user's own transactions from the
  *  last 30 days, grouped by day and shown as personal shares. Fully settled
  *  expenses end up here after they drop off the dashboard's active list. */
 export function HistoryPage({ user, room, members, expenses: initialExpenses }) {
@@ -216,7 +216,7 @@ export function HistoryPage({ user, room, members, expenses: initialExpenses }) 
 }
 
 function HistoryStatus({ expense, currentUserId }) {
-  // Check only the CURRENT user's share — not all members'. If I've paid my
+  // Check only the CURRENT user's share -- not all members'. If I've paid my
   // part, this transaction is settled for me regardless of others.
   const myShare = expense.splits?.[currentUserId];
   const myPaid = myShare?.status === "PAID";
