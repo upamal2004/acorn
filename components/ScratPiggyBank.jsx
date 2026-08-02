@@ -26,13 +26,13 @@ export function ScratPiggyBank({ amount, size = 280 }) {
         <rect width="280" height="280" fill="url(#piggyGlow)" rx="16" />
 
         {/* Celebration sparkles */}
-        <g className="animate_[sparkle-float_2s_ease-in-out_infinite]">
+        <g className="animate-[sparkle-float_2s_ease-in-out_infinite]">
           <circle cx="35" cy="45" r="4" fill="#F59E0B" opacity="0.7" />
           <circle cx="245" cy="40" r="3.5" fill="#EC4899" opacity="0.6" />
           <circle cx="235" cy="100" r="3" fill="#F59E0B" opacity="0.5" />
           <circle cx="30" cy="110" r="3" fill="#EC4899" opacity="0.5" />
         </g>
-        <g className="animate_[sparkle-float_2s_ease-in-out_infinite_0.5s]">
+        <g className="animate-[sparkle-float_2s_ease-in-out_infinite_0.5s]">
           <circle cx="65" cy="30" r="3" fill="#EC4899" opacity="0.5" />
           <circle cx="225" cy="30" r="3" fill="#F59E0B" opacity="0.4" />
         </g>
@@ -41,7 +41,7 @@ export function ScratPiggyBank({ amount, size = 280 }) {
         <ellipse cx="160" cy="255" rx="65" ry="8" fill="rgba(0,0,0,0.06)" />
 
         {/* === PIGGY BANK (center-right) === */}
-        <g className="animate_[piggy-bounce_2s_ease-in-out_infinite]">
+        <g className="animate-[piggy-bounce_2s_ease-in-out_infinite]">
           {/* Piggy body */}
           <ellipse cx="165" cy="200" rx="55" ry="42" fill="#F9A8D4" />
           <ellipse cx="168" cy="204" rx="42" ry="30" fill="#FBCFE8" />
@@ -84,7 +84,7 @@ export function ScratPiggyBank({ amount, size = 280 }) {
         </g>
 
         {/* === COIN dropping into piggy bank (smooth continuous) === */}
-        <g className="animate_[coin-drop_2.5s_ease-in-out_infinite]">
+        <g className="animate-[coin-drop_2.5s_ease-in-out_infinite]">
           <circle cx="169" cy="135" r="14" fill="#F59E0B" />
           <circle cx="169" cy="135" r="10" fill="#FBBF24" />
           <text x="169" y="139" fontSize="11" fill="#92400E" textAnchor="middle" fontWeight="bold">$</text>
@@ -92,13 +92,13 @@ export function ScratPiggyBank({ amount, size = 280 }) {
         </g>
 
         {/* === SCRAT (dropping coin, celebrating) === */}
-        <g className="animate_[scrat-celebrate_2s_ease-in-out_infinite]">
+        <g className="animate-[scrat-celebrate_2s_ease-in-out_infinite]">
           {/* Body */}
           <ellipse cx="75" cy="200" rx="30" ry="22" fill="#C4956A" />
           <ellipse cx="78" cy="203" rx="20" ry="14" fill="#E8D4B8" />
 
           {/* Tail - raised and wagging */}
-          <g className="origin-bottom animate_[tail-wag-fast_0.5s_ease-in-out_infinite]">
+          <g className="origin-bottom animate-[tail-wag-fast_0.5s_ease-in-out_infinite]">
             <path d="M43 192 Q30 172 28 152 Q26 140 34 137 Q42 134 44 150 Q48 170 50 190" fill="#C4956A" />
           </g>
 
@@ -106,7 +106,7 @@ export function ScratPiggyBank({ amount, size = 280 }) {
           <ellipse cx="102" cy="165" rx="22" ry="18" fill="#C4956A" />
 
           {/* Ears - perked */}
-          <g className="animate_[ears-excite_0.6s_ease-in-out_infinite_0.2s]">
+          <g className="animate-[ears-excite_0.6s_ease-in-out_infinite_0.2s]">
             <ellipse cx="87" cy="143" rx="7" ry="11" fill="#C4956A" transform="rotate(-5 87 143)" />
             <ellipse cx="87" cy="143" rx="4.5" ry="8" fill="#E8B4B4" transform="rotate(-5 87 143)" />
             <ellipse cx="112" cy="143" rx="7" ry="11" fill="#C4956A" transform="rotate(5 112 143)" />
@@ -131,7 +131,7 @@ export function ScratPiggyBank({ amount, size = 280 }) {
           <path d="M98 178 Q108 188 120 178" stroke="#3D2B1F" strokeWidth="2" fill="none" strokeLinecap="round" />
 
           {/* Front paw - dropping coin */}
-          <g className="animate_[paw-drop_2s_ease-in-out_infinite]">
+          <g className="animate-[paw-drop_2s_ease-in-out_infinite]">
             <path d="M100 200 Q120 185 145 180" stroke="#C4956A" strokeWidth="6" strokeLinecap="round" fill="none" />
             <circle cx="145" cy="180" r="5.5" fill="#D4A882" />
           </g>
@@ -144,10 +144,10 @@ export function ScratPiggyBank({ amount, size = 280 }) {
         </g>
 
         {/* === Coins popping out celebration === */}
-        <g className="animate_[coins-pop_2s_ease-out_1.2s_both]">
-          <circle cx="150" cy="148" r="7" fill="#F59E0B" opacity="0.6" className="animate_[money-float_2s_ease-in-out_infinite]" />
-          <circle cx="175" cy="142" r="6" fill="#F59E0B" opacity="0.5" className="animate_[money-float_2s_ease-in-out_infinite_0.4s]" />
-          <circle cx="162" cy="135" r="6.5" fill="#F59E0B" opacity="0.55" className="animate_[money-float_2s_ease-in-out_infinite_0.8s]" />
+        <g className="animate-[coins-pop_2s_ease-out_1.2s_both]">
+          <circle cx="150" cy="148" r="7" fill="#F59E0B" opacity="0.6" className="animate-[money-float_2s_ease-in-out_infinite]" />
+          <circle cx="175" cy="142" r="6" fill="#F59E0B" opacity="0.5" className="animate-[money-float_2s_ease-in-out_infinite_0.4s]" />
+          <circle cx="162" cy="135" r="6.5" fill="#F59E0B" opacity="0.55" className="animate-[money-float_2s_ease-in-out_infinite_0.8s]" />
         </g>
       </svg>
     </div>

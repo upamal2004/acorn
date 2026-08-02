@@ -16,7 +16,6 @@ export function ScratSpending({ amount, size = 280 }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Subtle vignette background */}
         <defs>
           <radialGradient id="vignette" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="transparent" />
@@ -56,7 +55,7 @@ export function ScratSpending({ amount, size = 280 }) {
 
         {/* === MONEY BILL being pulled away (continuous smooth motion) === */}
         <g className="animate-[money-pull-away_3s_cubic-bezier(0.4,0,0.2,1)_infinite]">
-          <g className="animate_[money-bill-wave_2s_ease-in-out_infinite]">
+          <g className="animate-[money-bill-wave_2s_ease-in-out_infinite]">
             {/* Bill body */}
             <rect x="140" y="120" width="40" height="22" rx="3" fill="#22c55e" />
             <rect x="143" y="123" width="34" height="16" rx="2" fill="#4ade80" />
@@ -68,20 +67,20 @@ export function ScratSpending({ amount, size = 280 }) {
             <line x1="145" y1="135" x2="175" y2="135" stroke="#22c55e" strokeWidth="0.7" opacity="0.5" />
           </g>
           {/* Motion blur lines */}
-          <g className="animate_[motion-blur_1s_ease-in-out_infinite]">
+          <g className="animate-[motion-blur_1s_ease-in-out_infinite]">
             <line x1="135" y1="128" x2="120" y2="132" stroke="#4ade80" strokeWidth="1" opacity="0.3" strokeLinecap="round" />
             <line x1="133" y1="134" x2="115" y2="137" stroke="#4ade80" strokeWidth="0.8" opacity="0.2" strokeLinecap="round" />
           </g>
         </g>
 
         {/* === SCRAT (sad, watching money leave) === */}
-        <g className="animate_[scrat-sad-lean_3s_ease-in-out_infinite]">
+        <g className="animate-[scrat-sad-lean_3s_ease-in-out_infinite]">
           {/* Body */}
           <ellipse cx="90" cy="220" rx="30" ry="22" fill="#C4956A" />
           <ellipse cx="93" cy="223" rx="20" ry="14" fill="#E8D4B8" />
 
           {/* Tail - drooping, trembling */}
-          <g className="animate_[tail-tremble_2s_ease-in-out_infinite]">
+          <g className="origin-bottom-left animate-[tail-tremble_2s_ease-in-out_infinite]">
             <path d="M58 212 Q45 195 40 178 Q36 165 42 162 Q48 159 50 172 Q54 190 60 210" fill="#C4956A" />
             <path d="M55 200 Q48 185 46 175 Q44 168 48 167" stroke="#E8D4B8" strokeWidth="2" fill="none" opacity="0.4" />
           </g>
@@ -119,7 +118,7 @@ export function ScratSpending({ amount, size = 280 }) {
           <path d="M139 195 L140 200" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
 
           {/* Front paws - reaching desperately toward money */}
-          <g className="animate_[paws-desperate_3s_ease-in-out_infinite]">
+          <g className="animate-[paws-desperate_3s_ease-in-out_infinite]">
             <path d="M110 220 Q130 208 150 212" stroke="#C4956A" strokeWidth="6" strokeLinecap="round" fill="none" />
             <circle cx="150" cy="212" r="5" fill="#D4A882" />
           </g>
@@ -132,15 +131,15 @@ export function ScratSpending({ amount, size = 280 }) {
         </g>
 
         {/* === TEARS streaming down === */}
-        <g className="animate_[tears-continuous_3s_ease-in-out_infinite]">
+        <g className="animate-[tears-continuous_3s_ease-in-out_infinite]">
           <path d="M108 186 Q106 195 108 204 Q110 195 108 186Z" fill="#60A5FA" opacity="0.7" />
         </g>
-        <g className="animate_[tears-continuous_3s_ease-in-out_infinite_0.8s]">
+        <g className="animate-[tears-continuous_3s_ease-in-out_infinite_0.8s]">
           <path d="M118 188 Q116 197 118 206 Q120 197 118 188Z" fill="#60A5FA" opacity="0.5" />
         </g>
 
         {/* === Shock/sadness symbols === */}
-        <g className="animate_[sad-float_3s_ease-out_infinite]">
+        <g className="animate-[sad-float_3s_ease-out_infinite]">
           <text x="170" y="100" fontSize="16" fill="#94a3b8" opacity="0.5">💔</text>
           <text x="190" y="80" fontSize="12" fill="#94a3b8" opacity="0.3">💸</text>
           <text x="210" y="60" fontSize="10" fill="#94a3b8" opacity="0.2">😢</text>

@@ -47,12 +47,17 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
   const isWallet = type === "wallet";
   const isSpending = type === "spent";
 
+  // Distinct backdrop colors for emotional clarity
+  const backdropClass = isSpending
+    ? "bg-red-950/40"
+    : "bg-emerald-950/40";
+
   return (
     <div
       className={`fixed inset-0 z-[80] flex flex-col items-center justify-center transition-all duration-700 ease-out ${
         phase === "fading"
           ? "bg-black/0 opacity-0"
-          : "bg-black/50 opacity-100"
+          : `${backdropClass} opacity-100`
       }`}
       style={{ backdropFilter: phase === "fading" ? "blur(0px)" : "blur(12px)" }}
     >
@@ -84,14 +89,14 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
         <div className="text-center">
           <p
             className={`text-4xl font-bold tracking-tight ${
-              isReceiving || isWallet ? "text-emerald-400" : "text-orange-400"
+              isSpending ? "text-red-400" : "text-emerald-400"
             }`}
           >
-            {isReceiving || isWallet ? "+" : "-"}Rs. {amount?.toLocaleString() || "0"}
+            {isSpending ? "-" : "+"}Rs. {amount?.toLocaleString() || "0"}
           </p>
           <p
             className={`mt-2 text-base font-medium ${
-              isReceiving || isWallet ? "text-emerald-300" : "text-orange-300"
+              isSpending ? "text-red-300" : "text-emerald-300"
             }`}
           >
             {label ||
@@ -107,7 +112,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
         <div className="w-48 h-1 overflow-hidden rounded-full bg-white/20">
           <div
             className={`h-full rounded-full transition-all duration-[2200ms] ease-linear ${
-              isReceiving || isWallet ? "bg-emerald-400" : "bg-orange-400"
+              isSpending ? "bg-red-400" : "bg-emerald-400"
             }`}
             style={{ width: phase === "fading" || phase === "visible" ? "100%" : "0%" }}
           />
