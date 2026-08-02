@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { DashboardHeader } from "@/components/DashboardHeader";
+import { Logo } from "@/components/Logo";
 
 /**
  * About page with app description and PWA install guide.
@@ -15,7 +16,14 @@ export function AboutPage({ user }) {
         {/* Hero */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center rounded-2xl bg-acorn-100 p-4">
-            <span className="text-5xl">🌰</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/android-chrome-192x192.png"
+              alt="Acorn logo"
+              width={80}
+              height={80}
+              className="h-20 w-20 object-contain"
+            />
           </div>
           <h1 className="mt-4 text-3xl font-bold text-slate-900">Acorn</h1>
           <p className="mt-2 text-lg text-slate-500">Split expenses, minus the awkwardness.</p>
