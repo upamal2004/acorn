@@ -25,6 +25,7 @@ model User {
   // Peach domain
   balance      Int            @default(0) // wallet, in cents
   dailyLimitCents Int?        // daily spending limit, in cents (null = no limit)
+  categoryLimits String?      // JSON string: { "FOOD": 5000, "TRANSPORT": 3000 } (cents, null = no limits)
   roomId       String?
   room         Room?          @relation("Membership", fields: [roomId], references: [id])
   ownedRooms   Room[]         @relation("Owned")

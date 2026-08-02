@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Avatar } from "@/components/Avatar";
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
+import { formatMoney } from "@/lib/money";
+import { personalAmount } from "@/lib/history";
 
-/** Modal form for adding an expense: title, category, description, amount,
- *  split members. The person adding the expense always pays for it ("Paid by:
- *  you") — there is no payer picker. Everyone who participated (including the
- *  creator) can be selected or unchecked; if the creator isn't in the split,
- *  the full amount is shared among the selected members only and the creator
- *  is owed the total. When `roomId` is null it's a personal (solo) expense:
- *  you pay for yourself, so the split picker is hidden too. */
-export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved }) {
+/** Modal form for adding an expense with soft category limit warnings. */
+export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved, user, expenses }) {
   const isPersonal = !roomId;
   const me = members.find((m) => m.id === currentUserId);
   const [title, setTitle] = useState("");
@@ -25,6 +21,36 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  // Compute today's spending per category for limit warnings
+  const todaySpending = useMemo(() => {
+    if (!expenses || !user?.categoryLimits) return {};
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    const spending = {};
+    for (const exp of expenses) {
+      const d = new Date(exp.createdAt);
+      const expKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (expKey !== todayKey) continue;
+      const amt = personalAmount(exp, currentUserId);
+      spending[exp.category] = (spending[exp.category] || 0) + amt;
+    }
+    return spending;
+  }, [expenses, user, currentUserId]);
+
+  // Check if selected category + amount exceeds limit
+  const limitWarning = useMemo(() => {
+    if (!user?.categoryLimits || !category || !amount) return null;
+    const limit = user.categoryLimits[category];
+    if (limit == null) return null;
+    const spent = todaySpending[category] || 0;
+    const newAmt = parseFloat(amount) || 0;
+    const total = spent + newAmt;
+    if (total > limit) {
+      return { category, spent, limit, total, exceeded: spent >= limit };
+    }
+    return null;
+  }, [user, category, amount, todaySpending]);
 
   function toggle(id) {
     setSelected((prev) => {
@@ -41,23 +67,8 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
     setError("");
 
     const body = isPersonal
-      ? {
-          title,
-          description,
-          category,
-          amount,
-          paidBy: currentUserId,
-          splitBetween: [currentUserId],
-        }
-      : {
-          roomId,
-          title,
-          description,
-          category,
-          amount,
-          paidBy: currentUserId,
-          splitBetween: [...selected],
-        };
+      ? { title, description, category, amount, paidBy: currentUserId, splitBetween: [currentUserId] }
+      : { roomId, title, description, category, amount, paidBy: currentUserId, splitBetween: [...selected] };
 
     try {
       const res = await fetch("/api/expenses", {
@@ -75,102 +86,64 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6"
-      onClick={onClose}
-    >
-      <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Add expense</h2>
-          <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">
-            ✕
-          </button>
+          <button onClick={onClose} className="btn-ghost px-2 py-1 text-lg leading-none">✕</button>
         </div>
+
+        {/* Category limit warning */}
+        {limitWarning && (
+          <div className={`mb-4 rounded-xl px-4 py-3 text-sm ${limitWarning.exceeded ? "bg-amber-50 text-amber-800" : "bg-amber-50/60 text-amber-700"}`}>
+            <p className="font-semibold">
+              {limitWarning.exceeded ? "Warning: Category limit exceeded!" : "Warning: Approaching category limit"}
+            </p>
+            <p className="mt-0.5 text-xs">
+              {EXPENSE_CATEGORIES.find(c => c.value === limitWarning.category)?.label} limit: {formatMoney(limitWarning.limit)} &middot; Already spent today: {formatMoney(limitWarning.spent)} &middot; After this expense: {formatMoney(limitWarning.total)}
+            </p>
+          </div>
+        )}
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">
-              What was it?
-            </label>
-            <input
-              className="input"
-              placeholder="e.g. Rent for August"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              autoFocus
-            />
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">What was it?</label>
+            <input className="input" placeholder="e.g. Rent for August" value={title} onChange={(e) => setTitle(e.target.value)} required autoFocus />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                Category
-              </label>
-              <select
-                className="input"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Category</label>
+              <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
                 {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.emoji} {c.label}
-                  </option>
+                  <option key={c.value} value={c.value}>{c.emoji} {c.label}</option>
                 ))}
               </select>
+              {user?.categoryLimits?.[category] != null && (
+                <p className="mt-1 text-xs text-slate-400">Limit: {formatMoney(user.categoryLimits[category])}/day</p>
+              )}
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                Notes{" "}
-                <span className="font-normal text-slate-400">(optional)</span>
-              </label>
-              <input
-                className="input"
-                placeholder="e.g. Split with Sam and the milk money"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Notes <span className="font-normal text-slate-400">(optional)</span></label>
+              <input className="input" placeholder="e.g. Split with Sam" value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
           </div>
 
           <div className={`grid gap-3 ${isPersonal ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                Total amount
-              </label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Total amount</label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                  Rs.
-                </span>
-                <input
-                  className="input pl-7"
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
+                <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">Rs.</span>
+                <input className="input pl-7" type="number" inputMode="decimal" step="0.01" min="0" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
               </div>
             </div>
             {!isPersonal && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                  Paid by
-                </label>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Paid by</label>
                 <div className="input flex items-center gap-2">
                   <Avatar name={me?.name || "You"} image={me?.image} size={22} />
-                  <span className="min-w-0 truncate text-sm text-slate-700">
-                    {me?.name || "You"}
-                  </span>
-                  <span className="ml-auto rounded-full bg-acorn-100 px-2 py-0.5 text-xs font-semibold text-acorn-700">
-                    You
-                  </span>
+                  <span className="min-w-0 truncate text-sm text-slate-700">{me?.name || "You"}</span>
+                  <span className="ml-auto rounded-full bg-acorn-100 px-2 py-0.5 text-xs font-semibold text-acorn-700">You</span>
                 </div>
               </div>
             )}
@@ -178,58 +151,25 @@ export function ExpenseModal({ roomId, members, currentUserId, onClose, onSaved 
 
           {!isPersonal && (
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                Split between ({selected.size})
-              </label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Split between ({selected.size})</label>
               <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
                 {members.map((m) => (
-                  <label
-                    key={m.id}
-                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${
-                      selected.has(m.id) ? "bg-acorn-50" : "hover:bg-slate-50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-acorn-500"
-                      checked={selected.has(m.id)}
-                      onChange={() => toggle(m.id)}
-                    />
+                  <label key={m.id} className={`flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition ${selected.has(m.id) ? "bg-acorn-50" : "hover:bg-slate-50"}`}>
+                    <input type="checkbox" className="h-4 w-4 accent-acorn-500" checked={selected.has(m.id)} onChange={() => toggle(m.id)} />
                     <Avatar name={m.name} image={m.image} size={26} />
                     <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{m.name}</span>
-                    {m.id === currentUserId && (
-                      <span className="ml-auto flex-none text-xs font-medium text-slate-400">
-                        you
-                      </span>
-                    )}
+                    {m.id === currentUserId && <span className="ml-auto flex-none text-xs font-medium text-slate-400">you</span>}
                   </label>
                 ))}
               </div>
-              <p className="mt-1.5 text-xs text-slate-400">
-                If you're not included, the full amount is split between the
-                selected members and you're owed the total.
-              </p>
+              <p className="mt-1.5 text-xs text-slate-400">If you&apos;re not included, the full amount is split between the selected members and you&apos;re owed the total.</p>
             </div>
           )}
 
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-              {error}
-            </p>
-          )}
+          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={busy || (!isPersonal && selected.size === 0)}
-            className="btn-primary w-full py-3"
-          >
-            {busy
-              ? "Adding…"
-              : isPersonal
-                ? "Add expense"
-                : selected.size > 1
-                  ? `Add expense - splits ${selected.size} ways`
-                  : "Add expense"}
+          <button type="submit" disabled={busy || (!isPersonal && selected.size === 0)} className="btn-primary w-full py-3">
+            {busy ? "Adding\u2026" : isPersonal ? "Add expense" : selected.size > 1 ? `Add expense - splits ${selected.size} ways` : "Add expense"}
           </button>
         </form>
       </div>

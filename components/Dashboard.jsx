@@ -251,6 +251,8 @@ export function Dashboard({
             setModalOpen(false);
             refresh();
           }}
+          user={user}
+          expenses={expenses}
         />
       )}
 
