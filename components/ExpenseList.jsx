@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Avatar } from "@/components/Avatar";
 import { StoryAnimation } from "@/components/StoryAnimation";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { formatMoney } from "@/lib/money";
 import { PENDING_VERIFICATION, PAID } from "@/lib/summary";
 import { categoryMeta } from "@/lib/categories";
@@ -80,12 +81,18 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [busyVerifyId, setBusyVerifyId] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const nameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
   const mySplit = expense.splits[currentUserId];
   const isOwner = expense.paidBy === currentUserId; // the payer verifies settlements
   const canDelete = expense.createdBy === currentUserId;
   const splitCount = Object.keys(expense.splits || {}).length;
+
+  // Personal expense: no room and only 1 split (the current user)
+  const isPersonal = !expense.roomId && splitCount === 1 && expense.splits[currentUserId];
+  // Can delete only if creator AND it's a personal expense
+  const canDeletePersonal = canDelete && isPersonal;
 
   // Long titles and expenses with notes get a "View details" affordance so the
   // full text never needs to squeeze into the row — it opens a clean modal.
@@ -136,12 +143,12 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
   }
 
   async function remove() {
-    if (!window.confirm(`Delete "${expense.title}"? This can't be undone.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/expenses/${expense.id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not delete.");
+      setShowDeleteConfirm(false);
       onChanged();
     } catch (err) {
       alert(err.message);
@@ -165,6 +172,11 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
             {" · "}
             {splitCount} {splitCount === 1 ? "person" : "people"} ·{" "}
             {formatMoney(expense.amount)} total
+            {isPersonal && (
+              <span className="ml-1.5 inline-block rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-600">
+                Personal
+              </span>
+            )}
           </p>
           {canViewDetails && (
             <button
@@ -207,11 +219,11 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
             )}
           </div>
 
-          {canDelete && (
+          {canDeletePersonal && (
             <button
-              onClick={remove}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={deleting}
-              title="Delete expense"
+              title="Delete personal expense"
               className="btn-ghost px-2 py-1.5 text-slate-400 transition hover:text-red-500"
             >
               {deleting ? (
@@ -223,6 +235,19 @@ function ExpenseRow({ expense, members, currentUserId, onChanged, onView, onCele
           )}
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      <ConfirmModal
+        show={showDeleteConfirm}
+        title="Delete expense?"
+        message={`Are you sure you want to delete "${expense.title}"? This action cannot be undone and the expense will be permanently removed.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        busy={deleting}
+        onConfirm={remove}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
 
       {pendingVerifications.length > 0 && (
         <div className="mt-3 space-y-2 rounded-xl bg-amber-50/80 px-3 py-2.5">
