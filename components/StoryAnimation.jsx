@@ -49,7 +49,7 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-all duration-700 ease-out ${
+      className={`fixed inset-0 z-[80] flex flex-col items-center justify-center transition-all duration-700 ease-out ${
         phase === "fading"
           ? "bg-black/0 opacity-0"
           : "bg-black/50 opacity-100"
