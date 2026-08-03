@@ -20,6 +20,7 @@
     "next": "^16.2.12",
     "next-auth": "5.0.0-beta.32",
     "pg": "^8.22.0",
+    "playwright": "^1.62.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^3.10.1",

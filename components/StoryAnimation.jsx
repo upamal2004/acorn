@@ -4,10 +4,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 const VIDEO_MAP = {
-  spent: "/spent.mp4.mp4?v=2",
-  received: "/received.mp4.mp4?v=2",
-  settled: "/received.mp4.mp4?v=2",
-  wallet: "/wallet.mp4.mp4?v=2",
+  spent: "/spent.mp4.mp4?v=3",
+  received: "/received.mp4.mp4?v=3",
+  settled: "/received.mp4.mp4?v=3",
+  wallet: "/wallet.mp4.mp4?v=3",
 };
 
 const FALLBACK_MS = 10000;
@@ -50,8 +50,11 @@ export function StoryAnimation({ type, amount, label, show = false, onComplete }
 
   useEffect(() => {
     if (phase === "visible" && videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
+      const v = videoRef.current;
+      v.muted = true;
+      v.volume = 0;
+      v.currentTime = 0;
+      v.play().catch(() => {});
     }
   }, [phase]);
 
